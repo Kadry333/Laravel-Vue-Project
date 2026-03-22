@@ -1,11 +1,12 @@
 <script setup>
-import AdminLayout from '@/Layouts/AdminLayout.vue'
+import ClientLayout from '@/Layouts/ClientLayout.vue';
 
-defineOptions({ layout: AdminLayout })
+
+defineOptions({ layout: ClientLayout })
 </script>
 
 <template>
     <div>
-     <h1>Admin</h1>
+        <h1>Client</h1>
     </div>
 </template>

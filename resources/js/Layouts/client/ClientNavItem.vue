@@ -8,7 +8,7 @@ const props = defineProps({
   icon:  Object,
 })
 
-const isActive = () => usePage().url.startsWith(props.href)
+const isActive = () => usePage().url === props.href
 </script>
 
 <template>

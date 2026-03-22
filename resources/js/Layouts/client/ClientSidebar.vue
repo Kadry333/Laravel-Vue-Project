@@ -17,9 +17,9 @@ import {
 import ClientNavItem from './ClientNavItem.vue'
 
 const navItems = [
-  { label: 'Dashboard',        icon: LayoutDashboard, href: '/dashboard'        },
+  { label: 'Dashboard',        icon: LayoutDashboard, href: '/'        },
   { label: 'My Reservations',  icon: CalendarDays,    href: '/my-reservations'  },
-  { label: 'Make Reservation', icon: BedDouble,       href: '/make-reservation' },
+  { label: 'Make Reservation', icon: BedDouble,       href: '/client/rooms' },
 ]
 </script>
 
