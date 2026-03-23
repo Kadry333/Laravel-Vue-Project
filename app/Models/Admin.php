@@ -3,8 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class Admin extends Model
+class Admin extends Authenticatable
 {
     protected $fillable = [
         'name',
@@ -29,11 +30,5 @@ class Admin extends Model
     {
 
         return $this->hasMany(Room::class, 'admin_id');
-    }
-
-    public function handledReservations()
-    {
-
-        return $this->hasMany(Reservation::class, 'handled_by');
     }
 }

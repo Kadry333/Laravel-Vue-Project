@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\ClientDashboard;
 
-use App\Cores\General\Enums\RoomAvailability;
+
 use App\Cores\General\RepositoryInterfaces\RoomRepositoryInterface;
 use App\Http\Controllers\Controller;
 use Inertia\Inertia;
@@ -18,7 +18,8 @@ class RoomController extends Controller
 
     public function index()
     {
-        $availableRooms =  $this->roomRepository->get(['floor'], ['is_available' => RoomAvailability::AVAILABLE]);
+        $availableRooms = $this->roomRepository->getCurrentlyAvailableRooms(['floor']);
+
         return Inertia::render('ClientDashboard/MakeReservation/Rooms', ['rooms' => $availableRooms]);
     }
 }

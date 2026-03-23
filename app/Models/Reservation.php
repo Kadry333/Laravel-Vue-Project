@@ -11,14 +11,8 @@ class Reservation extends Model
         'room_id',
         'accompany_number',
         'paid_price',
-        'handled_by'
+        'status'
     ];
-
-    public function handledBy()
-    {
-
-        return $this->belongsTo(Admin::class, 'handled_by');
-    }
 
     public function client()
     {

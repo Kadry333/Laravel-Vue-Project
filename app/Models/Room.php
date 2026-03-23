@@ -11,13 +11,10 @@ class Room extends Model
         'capacity',
         'price',
         'floor_id',
-        'admin_id',
-        'is_available'
+        'admin_id'
     ];
 
-    protected $casts = [
-        'is_available' => 'boolean',
-    ];
+
 
     public function floor()
     {

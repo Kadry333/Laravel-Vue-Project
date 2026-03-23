@@ -2,19 +2,16 @@
 
 namespace App\Cores\General\Repository;
 
-
-
-use App\Cores\General\RepositoryInterfaces\RoomRepositoryInterface;
-
-use App\Models\Room;
+use App\Cores\General\RepositoryInterfaces\ReservationRepositoryInterface;
+use App\Models\Reservation;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 
-class RoomRepository implements RoomRepositoryInterface
+class ReservationRepository implements ReservationRepositoryInterface
 {
     public function get(array $withRelational = [], array $conditions = []): Collection
     {
-        $query = Room::query();
+        $query = Reservation::query();
 
         if (!empty($withRelational)) {
             $query->with($withRelational);
@@ -27,9 +24,9 @@ class RoomRepository implements RoomRepositoryInterface
         return $query->get();
     }
 
-    public function find(int $id, array $withRelational = []): ?Room
+    public function find(int $id, array $withRelational = []): ?Reservation
     {
-        $query = Room::query();
+        $query = Reservation::query();
 
         if (!empty($withRelational)) {
             $query->with($withRelational);
@@ -38,19 +35,19 @@ class RoomRepository implements RoomRepositoryInterface
         return $query->find($id);
     }
 
-    public function store(array $data): Room
+    public function store(array $data): Reservation
     {
-        return Room::create($data);
+        return Reservation::create($data);
     }
 
     public function update(int $id, array $data): void
     {
-        Room::findOrFail($id)->update($data);
+        Reservation::findOrFail($id)->update($data);
     }
 
     public function delete(array $conditions): void
     {
-        $query = Room::query();
+        $query = Reservation::query();
 
         foreach ($conditions as $column => $value) {
             $query->where($column, $value);
@@ -61,7 +58,7 @@ class RoomRepository implements RoomRepositoryInterface
 
     public function paginate(int $perPage = 15, array $withRelational = [], array $conditions = []): LengthAwarePaginator
     {
-        $query = Room::query();
+        $query = Reservation::query();
 
         if (!empty($withRelational)) {
             $query->with($withRelational);
@@ -78,7 +75,7 @@ class RoomRepository implements RoomRepositoryInterface
 
     public function exists(array $conditions): bool
     {
-        $query = Room::query();
+        $query = Reservation::query();
 
         foreach ($conditions as $column => $value) {
             $query->where($column, $value);
@@ -89,12 +86,12 @@ class RoomRepository implements RoomRepositoryInterface
 
     public function count(): int
     {
-        return Room::count();
+        return Reservation::count();
     }
 
-    public function first(array $conditions = [], array $withRelational = []): ?Room
+    public function first(array $conditions = [], array $withRelational = []): ?Reservation
     {
-        $query = Room::query();
+        $query = Reservation::query();
 
         if (!empty($withRelational)) {
             $query->with($withRelational);
@@ -107,37 +104,24 @@ class RoomRepository implements RoomRepositoryInterface
         return $query->first();
     }
 
-    public function firstOrCreate(array $conditions, array $data = []): Room
+    public function firstOrCreate(array $conditions, array $data = []): Reservation
     {
-        return Room::firstOrCreate($conditions, $data);
+        return Reservation::firstOrCreate($conditions, $data);
     }
 
-    public function updateOrCreate(array $conditions, array $data = []): Room
+    public function updateOrCreate(array $conditions, array $data = []): Reservation
     {
-        return Room::updateOrCreate($conditions, $data);
+        return Reservation::updateOrCreate($conditions, $data);
     }
 
     public function sum(string $column, array $conditions = []): float
     {
-        $query = Room::query();
+        $query = Reservation::query();
 
         foreach ($conditions as $key => $value) {
             $query->where($key, $value);
         }
 
-        return $query->sum($column);
-    }
-
-    public function getCurrentlyAvailableRooms(array $withRelational = []): Collection
-    {
-        $query = Room::query();
-
-        if (!empty($withRelational)) {
-            $query->with($withRelational);
-        }
-
-        $query->whereDoesntHave('reservations');
-
-        return $query->get();
+        return (float) $query->sum($column);
     }
 }

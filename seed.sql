@@ -21,18 +21,18 @@ VALUES
 -- ==========================================
 -- 3. Rooms (linked to Floors & Admins)
 -- ==========================================
-INSERT INTO `rooms` (`number`, `capacity`, `price`, `floor_id`, `admin_id`, `is_available`, `created_at`, `updated_at`)
+INSERT INTO `rooms` (`number`, `capacity`, `price`, `floor_id`, `admin_id`, `created_at`, `updated_at`)
 VALUES
-(101, 2, 100.00, 1, 1, 1, NOW(), NOW()),
-(102, 4, 150.00, 1, 1, 0, NOW(), NOW()),
-(201, 2, 120.00, 2, 1, 1, NOW(), NOW()),
-(202, 3, 130.00, 2, 1, 1, NOW(), NOW()),
-(301, 1, 80.00, 3, 2, 1, NOW(), NOW()),
-(302, 2, 110.00, 3, 2, 0, NOW(), NOW()),
-(401, 4, 200.00, 4, 2, 1, NOW(), NOW()),
-(402, 3, 180.00, 4, 2, 1, NOW(), NOW()),
-(501, 2, 120.00, 5, 3, 1, NOW(), NOW()),
-(502, 5, 250.00, 5, 3, 1, NOW(), NOW());
+(101, 2, 100.00, 1, 1,  NOW(), NOW()),
+(102, 4, 150.00, 1, 1,  NOW(), NOW()),
+(201, 2, 120.00, 2, 1,  NOW(), NOW()),
+(202, 3, 130.00, 2, 1,  NOW(), NOW()),
+(301, 1, 80.00, 3, 2,  NOW(), NOW()),
+(302, 2, 110.00, 3, 2,  NOW(), NOW()),
+(401, 4, 200.00, 4, 2, NOW(), NOW()),
+(402, 3, 180.00, 4, 2,  NOW(), NOW()),
+(501, 2, 120.00, 5, 3,  NOW(), NOW()),
+(502, 5, 250.00, 5, 3,  NOW(), NOW());
 
 -- ==========================================
 -- 4. Clients
@@ -50,9 +50,9 @@ VALUES
 -- ==========================================
 -- ملاحظات: room_id هنا = id الفعلي للغرف (حسب AUTO_INCREMENT)
 -- Rooms أدخلناهم ترتيبهم من 1 إلى 10 => ids من 1 لـ 10
-INSERT INTO `reservations` (`client_id`, `room_id`, `accompany_number`, `paid_price`, `handled_by`, `created_at`, `updated_at`)
+INSERT INTO `reservations` (`client_id`, `room_id`, `accompany_number`, `paid_price`,  `created_at`, `updated_at`)
 VALUES
-(1, 1, 1, 100.00, 1, NOW(), NOW()), -- John Doe يحجز الغرفة 101
-(3, 4, 2, 260.00, 1, NOW(), NOW()), -- Ali Hassan يحجز الغرفة 202
-(4, 7, 3, 600.00, 2, NOW(), NOW()), -- Sara Ahmed يحجز الغرفة 401
-(1, 9, 1, 120.00, 3, NOW(), NOW()); -- John Doe يحجز الغرفة 501
+(1, 1, 1, 100.00,  NOW(), NOW()), -- John Doe يحجز الغرفة 101
+(3, 4, 2, 260.00,  NOW(), NOW()), -- Ali Hassan يحجز الغرفة 202
+(4, 7, 3, 600.00,  NOW(), NOW()), -- Sara Ahmed يحجز الغرفة 401
+(1, 9, 1, 120.00,  NOW(), NOW()); -- John Doe يحجز الغرفة 501

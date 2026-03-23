@@ -1,6 +1,5 @@
 <?php
 
-use App\Cores\General\Enums\RoomAvailability;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -19,7 +18,6 @@ return new class extends Migration
             $table->decimal('price', 10, 2);
             $table->foreignId('floor_id')->constrained('floors')->cascadeOnDelete();
             $table->foreignId('admin_id')->constrained('admins')->cascadeOnDelete();
-            $table->boolean('is_available')->default(RoomAvailability::AVAILABLE);
             $table->timestamps();
         });
     }

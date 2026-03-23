@@ -7,7 +7,29 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Users, DollarSign, Building2 } from 'lucide-vue-next'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { useForm } from '@inertiajs/vue3'
 
+const form = useForm({
+    room_id: null,
+    accompany_number: 0,
+})
+
+function confirm() {
+    form
+        .transform((data) => ({
+            ...data,
+            room_id: selected.value.id,
+        }))
+        .post('/client/reservation/create', {
+            onSuccess: () => {
+                open.value = false
+                form.reset()
+            },
+            onError: (errors) => {
+                console.log("Validation Errors:", errors);
+            }
+        })
+}
 
 defineOptions({ layout: ClientLayout })
 
@@ -21,6 +43,7 @@ const selected = ref(null)
 function openBooking(room) {
     selected.value = room
     open.value = true
+    form.clearErrors()
 }
 </script>
 
@@ -51,7 +74,7 @@ function openBooking(room) {
                         {{ room.capacity }} guests
                     </div>
                     <div class="flex items-center gap-1.5 text-sm text-slate-500">
-                        <DollarSign class="w-4 h-4" />
+
                         ${{ room.price }}/night
                     </div>
                 </div>
@@ -91,19 +114,22 @@ function openBooking(room) {
                         </div>
                         <div class="flex justify-between text-sm">
                             <span class="text-slate-500">Price</span>
-                            <span class="font-semibold">${{ selected.price }}/night</span>
+                            <span class="font-semibold">{{ selected.price }}/night</span>
                         </div>
                     </div>
 
                     <div class="space-y-2">
                         <Label>Accompany Number</Label>
-                        <Input type="number" min="0" :max="selected.capacity" />
-                        <p v-if="errorMsg" class="text-xs text-red-500">{{ errorMsg }}</p>
+                        <Input type="number" min="0" :max="selected.capacity" v-model="form.accompany_number" />
+                        <p v-if="form.errors.accompany_number" class="text-sm text-red-500">
+                            {{ form.errors.accompany_number }}
+                        </p>
+
                     </div>
 
                     <div class="flex gap-2 justify-end pt-2">
                         <Button variant="outline" @click="open = false">Cancel</Button>
-                        <Button @click="confirm">Confirm Booking</Button>
+                        <Button @click="confirm" :disabled="form.processing">Confirm Booking</Button>
                     </div>
 
                 </div>

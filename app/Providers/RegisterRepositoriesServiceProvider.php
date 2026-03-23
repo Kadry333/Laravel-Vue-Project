@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Cores\General\Repository\ReservationRepository;
 use App\Cores\General\Repository\RoomRepository;
+use App\Cores\General\RepositoryInterfaces\ReservationRepositoryInterface;
 use App\Cores\General\RepositoryInterfaces\RoomRepositoryInterface;
 use Illuminate\Support\ServiceProvider;
 
@@ -15,6 +17,7 @@ class RegisterRepositoriesServiceProvider extends ServiceProvider
     {
 
         $this->app->bind(RoomRepositoryInterface::class, RoomRepository::class);
+        $this->app->bind(ReservationRepositoryInterface::class, ReservationRepository::class);
     }
 
     /**

@@ -2,19 +2,17 @@
 
 namespace App\Cores\General\RepositoryInterfaces;
 
-
-
-use App\Models\Room;
+use App\Models\Reservation;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
-interface RoomRepositoryInterface
+interface ReservationRepositoryInterface
 {
     public function get(array $withRelational = [], array $conditions = []): Collection;
 
-    public function find(int $id, array $withRelational = []): ?Room;
+    public function find(int $id, array $withRelational = []): ?Reservation;
 
-    public function store(array $data): Room;
+    public function store(array $data): Reservation;
 
     public function update(int $id, array $data): void;
 
@@ -26,12 +24,11 @@ interface RoomRepositoryInterface
 
     public function count(): int;
 
-    public function first(array $conditions = [], array $withRelational = []): ?Room;
+    public function first(array $conditions = [], array $withRelational = []): ?Reservation;
 
-    public function firstOrCreate(array $conditions, array $data = []): Room;
+    public function firstOrCreate(array $conditions, array $data = []): Reservation;
 
-    public function updateOrCreate(array $conditions, array $data = []): Room;
+    public function updateOrCreate(array $conditions, array $data = []): Reservation;
 
     public function sum(string $column, array $conditions = []): float;
-    public function getCurrentlyAvailableRooms(array $withRelational = []): Collection;
 }
