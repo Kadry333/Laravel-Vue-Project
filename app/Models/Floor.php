@@ -9,12 +9,12 @@ class Floor extends Model
     protected $fillable = [
         'name',
         'number',
-        'admin_id'
+        'manager_id'
     ];
 
-    public function admin()
+     public function manager()
     {
-        return $this->belongsTo(Admin::class, 'admin_id');
+        return $this->belongsTo(User::class, 'manager_id');
     }
 
     public function rooms()

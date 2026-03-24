@@ -11,7 +11,7 @@ class Room extends Model
         'capacity',
         'price',
         'floor_id',
-        'admin_id'
+        'manager_id'
     ];
 
 
@@ -21,11 +21,10 @@ class Room extends Model
 
         return $this->belongsTo(Floor::class, 'floor_id');
     }
-
-    public function admin()
+   public function manager()
     {
 
-        return $this->belongsTo(Admin::class, 'admin_id');
+        return $this->belongsTo(User::class, 'manager_id');
     }
 
     public function reservations()

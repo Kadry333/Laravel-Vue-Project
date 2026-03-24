@@ -13,11 +13,14 @@ return new class extends Migration
     {
         Schema::create('reservations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('client_id')->constrained('clients')->cascadeOnDelete();
+            $table->foreignId('client_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('room_id')->constrained('rooms')->cascadeOnDelete();
+            $table->foreignId('receptionist_id')->constrained('users')->cascadeOnDelete();
             $table->integer('accompany_number');
-            $table->decimal('paid_price', 10, 2);
-            $table->foreignId('handled_by')->constrained('admins')->cascadeOnDelete();
+            $table->bigInteger('paid_price')->unsigned();
+            $table->enum('status', ['pending', 'approved'])->default('pending');
+            $table->date('check_in_date');
+            $table->date('check_out_date');
             $table->timestamps();
         });
     }

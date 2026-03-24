@@ -15,8 +15,17 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('national_id')->nullable()->unique();
+            $table->string('avatar_image')->nullable()->default('default.png');
+            $table->string('country')->nullable();
+            $table->enum('gender', ['male', 'female'])->nullable();
+            $table->string('mobile')->nullable();
+            $table->boolean('is_approved')->default(false);
+            $table->boolean('is_banned')->default(false);
+            $table->foreignId('approved_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->timestamp('last_login_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
