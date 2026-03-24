@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->integer('number')->unique();
-            $table->foreignId('admin_id')->constrained('admins')->cascadeOnDelete();
+            $table->foreignId('manager_id')->constrained('users')->cascadeOnDelete();
             $table->timestamps();
         });
     }
