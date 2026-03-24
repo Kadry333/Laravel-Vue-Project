@@ -35,9 +35,11 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
-        return [
-            ...parent::share($request),
-            //
-        ];
+        return array_merge(parent::share($request), [
+            'flash' => [
+                'payment_success' => fn() => $request->session()->get('payment_success'),
+                'payment_cancelled' => fn() => $request->session()->get('payment_cancelled'),
+            ],
+        ]);
     }
 }

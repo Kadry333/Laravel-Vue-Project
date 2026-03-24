@@ -19,6 +19,7 @@ return new class extends Migration
                     ReservationStatus::APPROVED
                 ]
             )->default(ReservationStatus::PENDING)->after('paid_price');
+            $table->string('payment_session_id')->nullable();
         });
     }
 

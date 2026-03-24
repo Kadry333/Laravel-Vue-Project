@@ -11,7 +11,8 @@ class Reservation extends Model
         'room_id',
         'accompany_number',
         'paid_price',
-        'status'
+        'status',
+        'payment_session_id'
     ];
 
     public function client()
