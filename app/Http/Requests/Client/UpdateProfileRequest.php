@@ -20,7 +20,7 @@ class UpdateProfileRequest extends FormRequest
                 'required',
                 'email',
                 'max:255',
-                Rule::unique('users', 'email')->ignore($this->user()->id),
+                Rule::unique('users', 'email')->ignore($this->user()?->id),
             ],
             'country' => ['nullable', 'string', 'max:255'],
             'gender' => ['nullable', 'in:male,female'],
