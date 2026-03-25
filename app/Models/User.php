@@ -26,6 +26,7 @@ class User extends Authenticatable
         'password',
         'national_id',
         'avatar_image',
+        'country',
         'gender',
         'mobile',
         'is_approved',

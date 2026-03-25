@@ -3,6 +3,7 @@
 use App\Http\Controllers\ClientDashboard\ReservationController;
 use App\Http\Controllers\ClientDashboard\RoomController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Client\ProfileController;
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -20,4 +21,9 @@ Route::prefix('reservation')->as('reservation.')->group(function () {
     Route::get('/success', [ReservationController::class, 'success'])->name('success');
     Route::get('/cancel', [ReservationController::class, 'cancel'])->name('cancel');
     
+});
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 });
