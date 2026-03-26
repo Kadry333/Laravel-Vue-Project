@@ -12,18 +12,19 @@ Route::get('/', function () {
 
 Route::prefix('rooms')->as('rooms.')->group(function () {
 
-    Route::get('/', [RoomController::class, 'index'])->name('index');
+    Route::get('/', [RoomController::class , 'index'])->name('index');
 });
 
 Route::prefix('reservation')->as('reservation.')->group(function () {
 
-    Route::post('/create', [ReservationController::class, 'create'])->name('create');
-    Route::get('/success', [ReservationController::class, 'success'])->name('success');
-    Route::get('/cancel', [ReservationController::class, 'cancel'])->name('cancel');
-    
+    Route::post('/create', [ReservationController::class , 'create'])->name('create');
+    Route::get('/success', [ReservationController::class , 'success'])->name('success');
+    Route::get('/cancel', [ReservationController::class , 'cancel'])->name('cancel');
+
+
 });
 
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::get('/profile', [ProfileController::class , 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class , 'update'])->name('profile.update');
 });
