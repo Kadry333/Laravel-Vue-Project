@@ -2,8 +2,8 @@
 
 use App\Http\Controllers\ClientDashboard\ReservationController;
 use App\Http\Controllers\ClientDashboard\RoomController;
+use App\Http\Controllers\ClientDashboard\ProfileController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Client\ProfileController;
 use Inertia\Inertia;
 
 Route::get('/', function () {

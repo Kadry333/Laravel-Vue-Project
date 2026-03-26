@@ -59,7 +59,7 @@ import { Search, Bell, Settings, LogOut } from 'lucide-vue-next'
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem as-child>
-          <Link href="/client/profile" class="flex items-center gap-2 cursor-pointer">
+          <Link :href="route('client.profile.edit')" class="flex items-center gap-2 cursor-pointer">
             <Settings class="w-4 h-4" /> Profile Settings
           </Link>
         </DropdownMenuItem>

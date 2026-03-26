@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Client;
+namespace App\Http\Controllers\ClientDashboard;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Client\UpdateProfileRequest;
@@ -23,7 +23,7 @@ class ProfileController extends Controller
             ->values()
             ->all();
 
-        return Inertia::render('Client/Profile/Edit', [
+        return Inertia::render('ClientDashboard/Profile/Edit', [
             'user' => $user,
             'countries' => $countries,
         ]);

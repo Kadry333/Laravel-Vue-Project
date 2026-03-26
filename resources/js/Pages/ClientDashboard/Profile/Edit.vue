@@ -4,6 +4,7 @@ import { Head, useForm } from '@inertiajs/vue3'
 import { Camera, Check, ChevronsUpDown, Mail, MapPin, UserRound } from 'lucide-vue-next'
 import { cn } from '@/lib/utils'
 
+import ClientLayout from '@/Layouts/ClientLayout.vue'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -27,6 +28,8 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/command'
+
+defineOptions({ layout: ClientLayout })
 
 const DEFAULT_AVATAR_PATH = '/images/default.png'
 
