@@ -39,6 +39,8 @@ class ReservationController extends Controller
             'accompany_number' => $request->accompany_number,
             'paid_price'       => $room->price,
             'status'           => ReservationStatus::PENDING,
+            'check_in_date' => now(),
+            'check_out_date' => now(),
         ]);
         $session = $this->stripePayment->createCheckoutSession($reservation->id, $reservation->paid_price);
         $reservation->update([
