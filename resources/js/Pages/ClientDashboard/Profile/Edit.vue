@@ -4,6 +4,7 @@ import { Head, useForm } from '@inertiajs/vue3'
 import { Camera, Check, ChevronsUpDown, Mail, MapPin, UserRound } from 'lucide-vue-next'
 import { cn } from '@/lib/utils'
 
+import ClientLayout from '@/Layouts/ClientLayout.vue'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -28,6 +29,8 @@ import {
   CommandList,
 } from '@/components/ui/command'
 
+defineOptions({ layout: ClientLayout })
+
 const DEFAULT_AVATAR_PATH = '/images/default.png'
 
 const props = defineProps({
@@ -43,6 +46,7 @@ const props = defineProps({
 
 const countryOpen = ref(false)
 const avatarInput = ref(null)
+const imageLoadFailed = ref(false)
 
 const form = useForm({
   name: props.user?.name ?? '',
@@ -61,6 +65,10 @@ const selectedCountryName = computed(() => {
 })
 
 const previewImage = computed(() => {
+  if (imageLoadFailed.value) {
+    return DEFAULT_AVATAR_PATH
+  }
+
   if (form.avatar_image instanceof File) {
     return URL.createObjectURL(form.avatar_image)
   }
@@ -93,7 +101,12 @@ const selectedAvatarName = computed(() => {
 })
 
 const handleAvatarChange = (event) => {
+  imageLoadFailed.value = false
   form.avatar_image = event.target.files?.[0] ?? null
+}
+
+const handleImageError = () => {
+  imageLoadFailed.value = true
 }
 
 const submit = () => {
@@ -136,6 +149,7 @@ const submit = () => {
                   :src="previewImage"
                   alt="Profile Image"
                   class="h-full w-full object-cover"
+                  @error="handleImageError"
                 >
               </div>
               <div class="absolute bottom-1 right-1 rounded-full border border-white bg-[#0c1a2e] p-2 text-white shadow">
