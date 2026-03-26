@@ -141,11 +141,11 @@ return [
     | your whole app.
      *
      */
-    'rule_factory' => [
-        'format' => \Astrotomic\Translatable\Validation\RuleFactory::FORMAT_ARRAY,
-        'prefix' => '%',
-        'suffix' => '%',
-    ],
+    // 'rule_factory' => [
+    //     'format' => \Astrotomic\Translatable\Validation\RuleFactory::FORMAT_ARRAY,
+    //     'prefix' => '%',
+    //     'suffix' => '%',
+    // ],
 
     /*
     |--------------------------------------------------------------------------

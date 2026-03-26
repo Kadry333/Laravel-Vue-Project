@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminDashboard\RoomController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -24,7 +25,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
 // roles routes
 Route::middleware(['auth', 'role:admin'])->get('/admin', function () {
     return Inertia::render('RolePage', ['role' => 'Admin']);
@@ -41,4 +42,16 @@ Route::middleware(['auth', 'role:receptionist'])->get('/receptionist', function 
 
 Route::middleware(['auth', 'role:client'])->get('/client', function () {
     return Inertia::render('RolePage', ['role' => 'Client']);
+});
+
+// ======================== Admin ====================
+Route::prefix('admin')->as('admin.')->group(function () {
+
+
+    Route::prefix('rooms')->as('rooms.')->group(function () {
+        Route::get('/',         [RoomController::class, 'index'])->name('index');
+        Route::post('/',        [RoomController::class, 'store'])->name('store');
+        Route::put('/{room}',   [RoomController::class, 'update'])->name('update');
+        Route::delete('/{room}', [RoomController::class, 'destroy'])->name('destroy');
+    });
 });

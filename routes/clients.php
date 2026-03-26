@@ -7,7 +7,8 @@ use App\Http\Controllers\Client\ProfileController;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return Inertia::render('ClientDashboard/MakeReservation/Rooms');
+
+    return Inertia::render('AdminDashboard/Admin');
 });
 
 Route::prefix('rooms')->as('rooms.')->group(function () {
@@ -20,7 +21,7 @@ Route::prefix('reservation')->as('reservation.')->group(function () {
     Route::post('/create', [ReservationController::class, 'create'])->name('create');
     Route::get('/success', [ReservationController::class, 'success'])->name('success');
     Route::get('/cancel', [ReservationController::class, 'cancel'])->name('cancel');
-    
+
 });
 
 Route::middleware('auth')->group(function () {
