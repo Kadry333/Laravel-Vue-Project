@@ -1,10 +1,11 @@
 <script setup>
-import GuestLayout from '@/Layouts/GuestLayout.vue';
-import InputError from '@/Components/InputError.vue';
-import InputLabel from '@/Components/InputLabel.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
-import TextInput from '@/Components/TextInput.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Hotel, UserPlus, LogIn } from 'lucide-vue-next';
+import InputError from '@/Components/InputError.vue';
 
 const form = useForm({
     name: '',
@@ -21,93 +22,106 @@ const submit = () => {
 </script>
 
 <template>
-    <GuestLayout>
-        <Head title="Register" />
+    <Head title="Join Grand Luxury | Register" />
 
-        <form @submit.prevent="submit">
-            <div>
-                <InputLabel for="name" value="Name" />
-
-                <TextInput
-                    id="name"
-                    type="text"
-                    class="mt-1 block w-full"
-                    v-model="form.name"
-                    required
-                    autofocus
-                    autocomplete="name"
-                />
-
-                <InputError class="mt-2" :message="form.errors.name" />
+    <div class="min-h-screen flex flex-col items-center justify-center bg-slate-50 p-4 sm:p-6 lg:p-8">
+        <!-- Brand Logo/Name -->
+        <Link :href="'/'" class="mb-8 flex items-center gap-2 group">
+            <div class="rounded-xl bg-indigo-600 p-2 text-white transition-transform group-hover:scale-110">
+                <Hotel :size="28" />
             </div>
+            <span class="text-2xl font-bold tracking-tight text-indigo-900">Grand Luxury</span>
+        </Link>
 
-            <div class="mt-4">
-                <InputLabel for="email" value="Email" />
+        <Card class="w-full max-w-md border-none shadow-xl shadow-indigo-100/50 overflow-hidden">
+            <div class="h-2 bg-indigo-600 w-full"></div>
+            <CardHeader class="space-y-1 pb-6 pt-8 text-center">
+                <CardTitle class="text-2xl font-bold tracking-tight text-slate-900">Create an account</CardTitle>
+                <CardDescription class="text-slate-500">
+                    Join us today and experience premium hospitality
+                </CardDescription>
+            </CardHeader>
 
-                <TextInput
-                    id="email"
-                    type="email"
-                    class="mt-1 block w-full"
-                    v-model="form.email"
-                    required
-                    autocomplete="username"
-                />
+            <CardContent>
+                <form @submit.prevent="submit" class="space-y-5">
+                    <!-- Name -->
+                    <div class="space-y-2">
+                        <Label for="name" class="text-sm font-medium text-slate-700">Full Name</Label>
+                        <Input
+                            id="name"
+                            v-model="form.name"
+                            type="text"
+                            placeholder="John Doe"
+                            
+                            autofocus
+                            class="border-slate-200 focus:ring-indigo-600 focus:border-indigo-600"
+                        />
+                        <InputError :message="form.errors.name" />
+                    </div>
 
-                <InputError class="mt-2" :message="form.errors.email" />
-            </div>
+                    <!-- Email -->
+                    <div class="space-y-2">
+                        <Label for="email" class="text-sm font-medium text-slate-700">Email Address</Label>
+                        <Input
+                            id="email"
+                            v-model="form.email"
+                            type="email"
+                            placeholder="name@example.com"
+                            class="border-slate-200 focus:ring-indigo-600 focus:border-indigo-600"
+                        />
+                        <InputError :message="form.errors.email" />
+                    </div>
 
-            <div class="mt-4">
-                <InputLabel for="password" value="Password" />
+                    <!-- Password Group -->
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div class="space-y-2">
+                            <Label for="password" class="text-sm font-medium text-slate-700">Password</Label>
+                            <Input
+                                id="password"
+                                v-model="form.password"
+                                type="password"
+                                class="border-slate-200 focus:ring-indigo-600"
+                            />
+                        </div>
+                        <div class="space-y-2">
+                            <Label for="password_confirmation" class="text-sm font-medium text-slate-700">Confirm</Label>
+                            <Input
+                                id="password_confirmation"
+                                v-model="form.password_confirmation"
+                                type="password"
+                                
+                                class="border-slate-200 focus:ring-indigo-600"
+                            />
+                        </div>
+                    </div>
+                    <InputError :message="form.errors.password" />
+                    <InputError :message="form.errors.password_confirmation" />
 
-                <TextInput
-                    id="password"
-                    type="password"
-                    class="mt-1 block w-full"
-                    v-model="form.password"
-                    required
-                    autocomplete="new-password"
-                />
+                    <Button 
+                        class="w-full h-11 text-base font-semibold bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-100" 
+                        :disabled="form.processing"
+                    >
+                        <span v-if="form.processing">Creating account...</span>
+                        <span v-else class="flex items-center">
+                            <UserPlus class="mr-2 h-4 w-4" /> Create Account
+                        </span>
+                    </Button>
+                </form>
+            </CardContent>
 
-                <InputError class="mt-2" :message="form.errors.password" />
-            </div>
+            <CardFooter class="flex flex-col space-y-4 bg-slate-50/50 border-t border-slate-100 py-6 text-center">
+                <p class="text-sm text-slate-600">
+                    Already have an account? 
+                    <Link :href="route('login')" class="font-semibold text-indigo-600 hover:text-indigo-700 ml-1">
+                        Sign in here
+                    </Link>
+                </p>
+            </CardFooter>
+        </Card>
 
-            <div class="mt-4">
-                <InputLabel
-                    for="password_confirmation"
-                    value="Confirm Password"
-                />
-
-                <TextInput
-                    id="password_confirmation"
-                    type="password"
-                    class="mt-1 block w-full"
-                    v-model="form.password_confirmation"
-                    required
-                    autocomplete="new-password"
-                />
-
-                <InputError
-                    class="mt-2"
-                    :message="form.errors.password_confirmation"
-                />
-            </div>
-
-            <div class="mt-4 flex items-center justify-end">
-                <Link
-                    :href="route('login')"
-                    class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                >
-                    Already registered?
-                </Link>
-
-                <PrimaryButton
-                    class="ms-4"
-                    :class="{ 'opacity-25': form.processing }"
-                    :disabled="form.processing"
-                >
-                    Register
-                </PrimaryButton>
-            </div>
-        </form>
-    </GuestLayout>
+        <!-- Optional helper footer -->
+        <p class="mt-8 text-center text-xs text-slate-400">
+            &copy; {{ new Date().getFullYear() }} Grand Luxury Hotel System. All rights reserved.
+        </p>
+    </div>
 </template>
