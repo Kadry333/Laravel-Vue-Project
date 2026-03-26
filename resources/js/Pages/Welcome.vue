@@ -66,7 +66,7 @@ defineProps({
 
         <main>
             <!-- Hero Section -->
-            <section class="relative h-[80vh] w-full overflow-hidden bg-indigo-950">
+            <section class="relative h-[100vh] w-full overflow-hidden bg-indigo-950">
                 <!-- <img
                     src="file:///C:/Users/mawad/.gemini/antigravity/brain/4ba507e3-a263-40d0-b88a-59d2934fff46/luxury_hotel_hero_background_1774532961597.png"
                     alt="Luxury Hotel"
