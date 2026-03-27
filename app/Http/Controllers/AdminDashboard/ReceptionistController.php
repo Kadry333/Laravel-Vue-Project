@@ -92,7 +92,7 @@ class ReceptionistController extends Controller
         }
 
         if ($request->hasFile('avatar_image')) {
-            $payload['avatar_image'] = $request->file('avatar_image')->store('receptionists/avatars', 'public');
+            $payload['avatar_image'] = $request->file('avatar_image')->store('staff/avatars', 'public');
         }
 
         $receptionist = User::create($payload);
@@ -127,7 +127,7 @@ class ReceptionistController extends Controller
 
         if ($request->hasFile('avatar_image')) {
             $this->deleteAvatarIfExists($receptionist);
-            $payload['avatar_image'] = $request->file('avatar_image')->store('receptionists/avatars', 'public');
+            $payload['avatar_image'] = $request->file('avatar_image')->store('staff/avatars', 'public');
         }
 
         $receptionist->update($payload);

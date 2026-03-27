@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -29,10 +30,15 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $user = $request->user();
+
         return [
             ...parent::share($request),
             'auth' => [
-                'user' => $request->user(),
+                'user' => $user,
+                'primary_role' => $user ? $this->resolvePrimaryRole($user) : null,
+                'role_label' => $user ? ucfirst($this->resolvePrimaryRole($user)) : null,
+                'profile_route' => $user ? $this->resolveProfileRoute($user) : null,
             ],
             'flash' => [
                 'payment_success' => fn() => $request->session()->get('payment_success'),
@@ -41,5 +47,23 @@ class HandleInertiaRequests extends Middleware
                 'error'   => $request->session()->get('error'),
             ],
         ];
+    }
+
+    private function resolvePrimaryRole(User $user): string
+    {
+        foreach (['admin', 'manager', 'receptionist', 'client'] as $role) {
+            if ($user->hasRole($role)) {
+                return $role;
+            }
+        }
+
+        return 'user';
+    }
+
+    private function resolveProfileRoute(User $user): string
+    {
+        return $user->hasRole('client')
+            ? route('client.profile.edit', absolute: false)
+            : route('admins.profile.index', absolute: false);
     }
 }

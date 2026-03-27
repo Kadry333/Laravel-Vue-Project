@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminDashboard\ManagerController;
+use App\Http\Controllers\AdminDashboard\ProfileController;
 use App\Http\Controllers\AdminDashboard\ReceptionistController;
 use App\Http\Controllers\AdminDashboard\RoomController;
 use Illuminate\Support\Facades\Route;
@@ -30,6 +31,11 @@ Route::middleware(['auth', 'logs-out-banned-user', 'role:admin|manager'])->group
     });
 });
 
+Route::middleware(['auth', 'logs-out-banned-user', 'role:admin|manager|receptionist'])->prefix('profile')->as('profile.')->group(function () {
+    Route::get('/', [ProfileController::class, 'index'])->name('index');
+    Route::patch('/', [ProfileController::class, 'update'])->name('update');
+});
+
 // ======================== Managers ====================
 Route::prefix('managers')->as('managers.')->group(function () {
     Route::get('/',                 [ManagerController::class, 'index'])->name('index');
@@ -40,4 +46,3 @@ Route::prefix('managers')->as('managers.')->group(function () {
     Route::post('/{manager}',       [ManagerController::class, 'update'])->name('update');
     Route::delete('/{manager}',     [ManagerController::class, 'destroy'])->name('destroy');
 });
-

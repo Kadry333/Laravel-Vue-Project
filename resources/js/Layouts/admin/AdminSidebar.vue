@@ -1,5 +1,6 @@
 <script setup>
-import { Link } from '@inertiajs/vue3'
+import { computed } from 'vue'
+import { Link, usePage } from '@inertiajs/vue3'
 import {
     Sidebar, SidebarContent, SidebarFooter,
     SidebarGroup, SidebarGroupLabel,
@@ -9,10 +10,10 @@ import {
     DropdownMenu, DropdownMenuContent, DropdownMenuItem,
     DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
     Hotel, ChevronDown, Settings, LogOut,
-    LayoutDashboard, UserCog, UserCheck, Users, BarChart3, Bed, Layers
+    LayoutDashboard, UserCog, UserCheck, Users, BarChart3, Bed
 } from 'lucide-vue-next'
 import AdminNavItem from './AdminNavItem.vue'
 
@@ -24,6 +25,42 @@ const navItems = [
     { label: 'Statistics', icon: BarChart3, href: '/statistics' },
     { label: 'Manage Rooms', icon: Bed, href: '/admins/rooms' },
 ]
+
+const page = usePage()
+const DEFAULT_AVATAR_PATH = '/images/default.png'
+
+const authUser = computed(() => page.props.auth?.user ?? null)
+
+const profileHref = computed(() => page.props.auth?.profile_route ?? '/profile')
+
+const avatarSrc = computed(() => {
+    const path = authUser.value?.avatar_image
+
+    if (!path || path === 'default.png') {
+        return DEFAULT_AVATAR_PATH
+    }
+
+    if (
+        path.startsWith('http://') ||
+        path.startsWith('https://') ||
+        path.startsWith('/')
+    ) {
+        return path
+    }
+
+    return `/storage/${path}`
+})
+
+const initials = computed(() => {
+    const name = authUser.value?.name ?? 'John Doe'
+
+    return name
+        .split(' ')
+        .map((part) => part[0] ?? '')
+        .join('')
+        .slice(0, 2)
+        .toUpperCase()
+})
 </script>
 
 <template>
@@ -69,14 +106,15 @@ const navItems = [
                     <button class="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-[9px]
                          hover:bg-[#162840] transition-colors duration-150 text-left">
                         <Avatar class="w-[34px] h-[34px] shrink-0">
+                            <AvatarImage :src="avatarSrc" :alt="authUser?.name ?? 'User'" class="object-cover" />
                             <AvatarFallback class="text-[12px] font-bold text-white"
                                 style="background: linear-gradient(135deg,#8b5cf6,#ec4899)">
-                                JD
+                                {{ initials }}
                             </AvatarFallback>
                         </Avatar>
                         <div class="flex-1 min-w-0">
-                            <p class="text-[12.5px] font-semibold text-[#dde8f0] truncate">John Doe</p>
-                            <p class="text-[11px] text-[#5a7a96] mt-0.5">Administrator</p>
+                            <p class="text-[12.5px] font-semibold text-[#dde8f0] truncate">{{ authUser?.name ?? 'John Doe' }}</p>
+                            <p class="text-[11px] text-[#5a7a96] mt-0.5">{{ page.props.auth?.role_label ?? 'Administrator' }}</p>
                         </div>
                         <ChevronDown class="w-3.5 h-3.5 text-[#3a5a76] shrink-0" />
                     </button>
@@ -84,12 +122,12 @@ const navItems = [
 
                 <DropdownMenuContent side="top" align="start" class="w-56 mb-1">
                     <DropdownMenuLabel class="font-normal">
-                        <p class="text-[13px] font-semibold">John Doe</p>
-                        <p class="text-[11.5px] text-muted-foreground">john@luxestay.com</p>
+                        <p class="text-[13px] font-semibold">{{ authUser?.name ?? 'John Doe' }}</p>
+                        <p class="text-[11.5px] text-muted-foreground">{{ authUser?.email ?? 'john@luxestay.com' }}</p>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem as-child>
-                        <Link href="/profile" class="flex items-center gap-2 cursor-pointer">
+                        <Link :href="profileHref" class="flex items-center gap-2 cursor-pointer">
                             <Settings class="w-4 h-4" /> Profile Settings
                         </Link>
                     </DropdownMenuItem>
