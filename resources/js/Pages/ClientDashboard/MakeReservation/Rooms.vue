@@ -1,76 +1,91 @@
 <script setup>
 import ClientLayout from '@/Layouts/ClientLayout.vue'
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogDescription
+    Dialog, DialogContent, DialogHeader,
+    DialogTitle, DialogDescription
 } from '@/components/ui/dialog'
-import {
-    Users,
-    Building2,
-    CheckCircle2,
-    ArrowRight,
-    XCircle
-} from 'lucide-vue-next'
+import { Users, Building2, CheckCircle2, ArrowRight, XCircle } from 'lucide-vue-next'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useForm, usePage, Link } from '@inertiajs/vue3'
 
 defineOptions({ layout: ClientLayout })
 
-const props = defineProps({
-    rooms: Array
-})
+const props = defineProps({ rooms: Array })
 
 const page = usePage()
 const open = ref(false)
 const selected = ref(null)
 const showSuccess = ref(false)
 const showCancel = ref(false)
+const successData = ref(null)
 
+const today = new Date().toISOString().split('T')[0]
 
 const form = useForm({
     room_id: null,
+    check_in_date: '',
+    check_out_date: '',
     accompany_number: 0,
 })
 
-const successData = ref(null);
 
-onMounted(() => {
-    console.log('All Page Props:', page.props);
-    if (page.props.flash && page.props.flash.payment_success) {
-        successData.value = page.props.flash.payment_success;
-        showSuccess.value = true;
-    }
-    if (page.props.flash && page.props.flash.payment_cancelled) {
+const bookedRanges = computed(() => selected.value?.blocked_ranges ?? [])
 
-        showCancel.value = true
 
-    }
-});
+const minCheckout = computed(() => {
+    if (!form.check_in_date) return today
+    const d = new Date(form.check_in_date)
+    d.setDate(d.getDate() + 1)
+    return d.toISOString().split('T')[0]
+})
+
+const nights = computed(() => {
+    if (!form.check_in_date || !form.check_out_date) return 0
+    const diff = new Date(form.check_out_date) - new Date(form.check_in_date)
+    return Math.round(diff / (1000 * 60 * 60 * 24))
+})
+
+const totalPrice = computed(() => {
+    if (!selected.value || !nights.value) return '0.00'
+    return ((selected.value.price / 100) * nights.value).toFixed(2)
+})
 
 function openBooking(room) {
     selected.value = room
     open.value = true
+    form.reset()
     form.clearErrors()
 }
 
 function confirm() {
-    form.transform((data) => ({
+    form.transform(data => ({
         ...data,
         room_id: selected.value.id,
     })).post('/client/reservation/create', {
         onSuccess: () => {
             open.value = false
             form.reset()
-        }
+        },
+        onError: () => {
+            console.log(form.errors)
+        },
+
     })
 }
+
+onMounted(() => {
+    if (page.props.flash?.payment_success) {
+        successData.value = page.props.flash.payment_success
+        showSuccess.value = true
+    }
+    if (page.props.flash?.payment_cancelled) {
+        showCancel.value = true
+    }
+})
 </script>
 
 <template>
@@ -80,38 +95,30 @@ function confirm() {
                 <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Available Rooms</h1>
                 <p class="text-slate-500 mt-2">Select your preferred room and book instantly.</p>
             </div>
-            <div class="hidden md:block">
-                <Badge variant="outline" class="px-4 py-1.5 border-slate-200 text-slate-600 bg-white">
-                    {{ rooms.length }} Rooms Found
-                </Badge>
-            </div>
+            <Badge variant="outline" class="hidden md:block px-4 py-1.5 border-slate-200 text-slate-600 bg-white">
+                {{ rooms.length }} Rooms Found
+            </Badge>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <div v-for="room in rooms" :key="room.id"
-                class="group bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 relative overflow-hidden">
+                class="group bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300">
 
                 <div class="flex items-start justify-between mb-4">
                     <div class="space-y-1">
                         <p class="text-3xl font-black text-slate-900 leading-none">#{{ room.number }}</p>
                         <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">{{ room.floor.name }}</p>
                     </div>
-                    <Badge class="bg-emerald-50 text-emerald-700 border-emerald-200 px-3 py-1">
-                        Available
-                    </Badge>
+                    <Badge class="bg-emerald-50 text-emerald-700 border-emerald-200 px-3 py-1">Available</Badge>
                 </div>
 
                 <div class="grid grid-cols-2 gap-3 mb-6">
-                    <div class="flex items-center gap-2 px-3 py-2 bg-slate-50 rounded-xl text-slate-600">
+                    <div class="flex items-center gap-2 px-3 py-2 bg-slate-50 rounded-xl">
                         <Users class="w-4 h-4 text-slate-400" />
-                        <span class="text-sm font-semibold">{{ room.capacity }} Guests</span>
+                        <span class="text-sm font-semibold text-slate-600">{{ room.capacity }} Guests</span>
                     </div>
-
-                    <!-- ✔ FIX CENT -->
-                    <div class="flex items-center gap-2 px-3 py-2 bg-slate-50 rounded-xl text-slate-600">
-                        <span class="text-sm font-bold text-slate-900">
-                            ${{ (room.price / 100).toFixed(2) }}
-                        </span>
+                    <div class="flex items-center gap-2 px-3 py-2 bg-slate-50 rounded-xl">
+                        <span class="text-sm font-bold text-slate-900">${{ (room.price / 100).toFixed(2) }}</span>
                         <span class="text-[10px] text-slate-400 uppercase">/ Night</span>
                     </div>
                 </div>
@@ -129,55 +136,88 @@ function confirm() {
             </div>
         </div>
 
+        <!-- Booking Dialog -->
         <Dialog v-model:open="open">
             <DialogContent class="sm:max-w-md rounded-[2rem]">
                 <DialogHeader>
                     <DialogTitle class="text-xl font-bold">Complete Your Booking</DialogTitle>
-                    <DialogDescription>Details for room #{{ selected?.number }}</DialogDescription>
+                    <DialogDescription>Room #{{ selected?.number }}</DialogDescription>
                 </DialogHeader>
 
-                <div v-if="selected" class="space-y-6 py-4">
+                <div v-if="selected" class="space-y-5 py-2">
 
-
-                    <div class="bg-slate-50 rounded-2xl p-5 border border-slate-100 flex justify-between items-center">
-                        <div class="space-y-1">
-                            <span class="text-[10px] uppercase font-bold text-slate-400 tracking-widest">
-                                Room Type
-                            </span>
-                            <p class="text-sm font-bold text-slate-800">
-                                {{ selected.capacity }} Person
-                            </p>
+                    <!-- Room Info -->
+                    <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100 flex justify-between">
+                        <div>
+                            <p class="text-[10px] uppercase font-bold text-slate-400 tracking-widest">Capacity</p>
+                            <p class="text-sm font-bold text-slate-800">{{ selected.capacity }} Person</p>
                         </div>
-
-                      
-                        <div class="space-y-1 text-right">
-                            <span class="text-[10px] uppercase font-bold text-slate-400 tracking-widest">
-                                Price
-                            </span>
-                            <p class="text-sm font-bold text-emerald-600">
-                                ${{ (selected.price / 100).toFixed(2) }}
-                            </p>
+                        <div class="text-right">
+                            <p class="text-[10px] uppercase font-bold text-slate-400 tracking-widest">Per Night</p>
+                            <p class="text-sm font-bold text-emerald-600">${{ (selected.price / 100).toFixed(2) }}</p>
                         </div>
                     </div>
+                    <!-- Booked Dates -->
+                    <div v-if="bookedRanges.length" class="bg-red-50 border border-red-100 rounded-xl p-3 space-y-1">
+                        <p class="text-[10px] uppercase font-bold text-red-400 tracking-widest mb-2">Unavailable Dates
+                        </p>
+                        <div v-for="range in bookedRanges" :key="range.start"
+                            class="flex items-center justify-between text-xs text-red-500 font-medium bg-white rounded-lg px-3 py-1.5 border border-red-100">
+                            <span>{{ range.start }}</span>
+                            <span class="text-red-300 mx-2">→</span>
+                            <span>{{ range.end }}</span>
+                        </div>
+                    </div>
+                    <!-- Dates -->
+                    <div class="space-y-3">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="space-y-1.5">
+                                <Label class="text-slate-700 font-semibold text-sm">Check-in</Label>
+                                <Input type="date" v-model="form.check_in_date" :min="today" class="rounded-xl h-11" />
+                                <p v-if="form.errors.check_in_date" class="text-xs text-red-500">{{
+                                    form.errors.check_in_date }}</p>
+                            </div>
+                            <div class="space-y-1.5">
+                                <Label class="text-slate-700 font-semibold text-sm">Check-out</Label>
+                                <Input type="date" v-model="form.check_out_date" :min="minCheckout"
+                                    :disabled="!form.check_in_date" class="rounded-xl h-11" />
+                                <p v-if="form.errors.check_out_date" class="text-xs text-red-500">{{
+                                    form.errors.check_out_date }}</p>
+                            </div>
+                        </div>
 
-                    <div class="space-y-3 text-right">
-                        <Label class="text-slate-700 font-semibold">Accompany Number</Label>
-
-                        <Input type="number" min="0" :max="selected.capacity" v-model="form.accompany_number"
-                            class="rounded-xl h-12" />
-
-
-                        <p v-if="form.errors.accompany_number"
-                            class="text-sm text-red-600 bg-red-50 border border-red-200 px-3 py-2 rounded-xl flex items-center gap-2 justify-end">
-                            <XCircle class="w-4 h-4 shrink-0" />
-                            <span>{{ form.errors.accompany_number }}</span>
+                        <!-- room_id error = overlap error -->
+                        <p v-if="form.errors.room_id"
+                            class="text-xs text-red-600 bg-red-50 border border-red-200 px-3 py-2 rounded-xl flex items-center gap-1.5">
+                            <XCircle class="w-3.5 h-3.5 shrink-0" /> {{ form.errors.room_id }}
                         </p>
                     </div>
 
-                    <div class="flex gap-3 pt-2">
+                    <!-- Total -->
+                    <div v-if="nights > 0"
+                        class="bg-emerald-50 border border-emerald-100 rounded-xl px-4 py-3 flex justify-between items-center">
+                        <span class="text-sm text-emerald-700 font-semibold">{{ nights }} Night{{ nights > 1 ? 's' : ''
+                            }}</span>
+                        <span class="text-sm font-black text-emerald-700">Total: ${{ totalPrice }}</span>
+                    </div>
+
+                    <!-- Accompany -->
+                    <div class="space-y-1.5">
+                        <Label class="text-slate-700 font-semibold text-sm">Accompany Number</Label>
+                        <Input type="number" min="0" :max="selected.capacity" v-model="form.accompany_number"
+                            class="rounded-xl h-11" />
+                        <p v-if="form.errors.accompany_number"
+                            class="text-xs text-red-600 bg-red-50 border border-red-200 px-3 py-2 rounded-xl flex items-center gap-1.5">
+                            <XCircle class="w-3.5 h-3.5 shrink-0" /> {{ form.errors.accompany_number }}
+                        </p>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex gap-3 pt-1">
                         <Button variant="outline" @click="open = false" class="flex-1 rounded-xl h-12">Cancel</Button>
-                        <Button @click="confirm" :disabled="form.processing"
-                            class="flex-1 rounded-xl h-12 bg-slate-900">
+                        <Button @click="confirm"
+                            :disabled="form.processing || !form.check_in_date || !form.check_out_date"
+                            class="flex-1 rounded-xl h-12 bg-slate-900 disabled:opacity-40">
                             {{ form.processing ? 'Redirecting...' : 'Confirm & Pay' }}
                         </Button>
                     </div>

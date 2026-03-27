@@ -18,8 +18,20 @@ class RoomController extends Controller
 
     public function index()
     {
-        $availableRooms = $this->roomRepository->getCurrentlyAvailableRooms(['floor']);
+        $rooms = $this->roomRepository->getRoomsWithReservations(['floor']);
 
-        return Inertia::render('ClientDashboard/MakeReservation/Rooms', ['rooms' => $availableRooms]);
+        $rooms->transform(function ($room) {
+            $room->blocked_ranges = $room->reservations
+                ->map(fn($r) => [
+                    'start' => $r->check_in_date,
+                    'end'   => $r->check_out_date,
+                ]);
+            unset($room->reservations);
+            return $room;
+        });
+
+        return Inertia::render('ClientDashboard/MakeReservation/Rooms', [
+            'rooms' => $rooms
+        ]);
     }
 }

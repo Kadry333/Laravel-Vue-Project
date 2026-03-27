@@ -154,15 +154,13 @@ class RoomRepository implements RoomRepositoryInterface
         return $query->sum($column);
     }
 
-    public function getCurrentlyAvailableRooms(array $withRelational = []): Collection
+    public function getRoomsWithReservations(array $withRelational = []): Collection
     {
         $query = Room::query();
 
-        if (!empty($withRelational)) {
-            $query->with($withRelational);
-        }
 
-        $query->whereDoesntHave('reservations');
+        $relations = array_merge($withRelational, ['reservations:id,room_id,check_in_date,check_out_date']);
+        $query->with($relations);
 
         return $query->get();
     }

@@ -33,19 +33,24 @@ class ReservationController extends Controller
     {
         $clientId = env("CLIENT_ID");
         $room = $this->roomRepository->find($request->room_id);
+
+        $nights = \Carbon\Carbon::parse($request->check_in_date)
+            ->diffInDays(\Carbon\Carbon::parse($request->check_out_date));
+
         $reservation = $this->reservationRepository->store([
             'client_id'        => $clientId,
             'room_id'          => $request->room_id,
             'accompany_number' => $request->accompany_number,
-            'paid_price'       => $room->price,
+            'paid_price'       => $room->price * $nights,
             'status'           => ReservationStatus::PENDING,
-            'check_in_date' => now(),
-            'check_out_date' => now(),
+            'check_in_date'    => $request->check_in_date,
+            'check_out_date'   => $request->check_out_date,
         ]);
+
         $session = $this->stripePayment->createCheckoutSession($reservation->id, $reservation->paid_price);
-        $reservation->update([
-            'payment_session_id' => $session->id
-        ]);
+
+        $reservation->update(['payment_session_id' => $session->id]);
+
         return Inertia::location($session->url);
     }
 

@@ -38,5 +38,5 @@ interface RoomRepositoryInterface
     public function updateOrCreate(array $conditions, array $data = []): Room;
 
     public function sum(string $column, array $conditions = []): float;
-    public function getCurrentlyAvailableRooms(array $withRelational = []): Collection;
+    public function getRoomsWithReservations(array $withRelational = []): Collection;
 }

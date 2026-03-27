@@ -20,18 +20,30 @@ class CreateReservationRequest extends FormRequest
         $room = $roomRepository->find($this->room_id);
 
         return [
-            'room_id' => ['required', 'exists:rooms,id'],
+
+            'check_in_date'  => ['required', 'date', 'after_or_equal:today'],
+            'check_out_date' => ['required', 'date', 'after:check_in_date'],
             'accompany_number' => [
                 'required',
                 'integer',
                 'min:0',
                 function ($attribute, $value, $fail) use ($room) {
-                    if ($room->reservations()->exists()) {
-                        $fail("Sorry, this room is currently not available for booking.");
-                    }
-
                     if ($value > $room->capacity) {
                         $fail("The accompany number cannot exceed the room capacity ({$room->capacity}).");
+                    }
+                },
+            ],
+            'room_id' => [
+                'required',
+                'exists:rooms,id',
+                function ($attribute, $value, $fail) {
+                    $overlap = \App\Models\Reservation::where('room_id', $value)
+                        ->where('check_in_date', '<', $this->check_out_date)
+                        ->where('check_out_date', '>', $this->check_in_date)
+                        ->exists();
+
+                    if ($overlap) {
+                        $fail('This room is already booked for the selected dates.');
                     }
                 },
             ],
