@@ -79,8 +79,6 @@ class ManagerController extends Controller
     public function destroy($id)
     {
         try {
-            throw new \Exception("Error Processing Request", 1);
-
             $manager = User::role('manager')->findOrFail($id);
 
             if ($manager->avatar_image) {
@@ -89,7 +87,8 @@ class ManagerController extends Controller
 
             $manager->delete();
 
-            return back()->with('success', 'Manager deleted successfully.');
+            return redirect()->route('admins.managers.index')
+                ->with('success', 'Manager deleted successfully.');
         } catch (\Exception $e) {
             return back()->with('error', 'Something went wrong while deleting the manager.');
         }
