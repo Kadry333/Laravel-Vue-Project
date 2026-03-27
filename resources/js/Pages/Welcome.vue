@@ -67,11 +67,11 @@ defineProps({
         <main>
             <!-- Hero Section -->
             <section class="relative h-[80vh] w-full overflow-hidden bg-indigo-950">
-                <img
+                <!-- <img
                     src="file:///C:/Users/mawad/.gemini/antigravity/brain/4ba507e3-a263-40d0-b88a-59d2934fff46/luxury_hotel_hero_background_1774532961597.png"
                     alt="Luxury Hotel"
                     class="absolute inset-0 h-full w-full object-cover opacity-60 mix-blend-overlay"
-                />
+                /> -->
                 <div class="relative mx-auto flex h-full max-w-7xl flex-col items-center justify-center px-4 pt-10 text-center text-white sm:px-6 lg:px-8">
                     <Badge variant="outline" class="mb-4 border-indigo-400 text-indigo-200 font-medium tracking-wide">
                         PREMIUM HOTEL SYSTEM

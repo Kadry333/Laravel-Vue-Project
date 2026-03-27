@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\AdminsDashboard\ClientController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -26,19 +27,20 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__.'/auth.php';
 // roles routes
-Route::middleware(['auth', 'role:admin'])->get('/admin', function () {
-    return Inertia::render('RolePage', ['role' => 'Admin']);
-});
+// Route::middleware(['auth', 'role:admin'])->get('/admin', function () {
+//     return Inertia::render('RolePage', ['role' => 'Admin']);
+// });
 
 
-Route::middleware(['auth', 'role:manager'])->get('/manager', function () {
-    return Inertia::render('RolePage', ['role' => 'Manager']);
-});
+// Route::middleware(['auth', 'role:manager'])->get('/manager', function () {
+//     return Inertia::render('RolePage', ['role' => 'Manager']);
+// });
 
-Route::middleware(['auth', 'role:receptionist'])->get('/receptionist', function () {
-    return Inertia::render('RolePage', ['role' => 'Receptionist']);
-});
+// Route::middleware(['auth', 'role:receptionist'])->get('/receptionist', function () {
+//     return Inertia::render('RolePage', ['role' => 'Receptionist']);
+// });
 
-Route::middleware(['auth', 'role:client'])->get('/client', function () {
-    return Inertia::render('RolePage', ['role' => 'Client']);
-});
+// Route::middleware(['auth', 'role:client'])->get('/client', function () {
+//     return Inertia::render('RolePage', ['role' => 'Client']);
+// });
+
