@@ -17,9 +17,9 @@ import {
 import AdminNavItem from './AdminNavItem.vue'
 
 const navItems = [
-    { label: 'Dashboard', icon: LayoutDashboard, href: '/dashboard' },
+    { label: 'Dashboard', icon: LayoutDashboard, href: '/admins' },
     { label: 'Manage Managers', icon: UserCog, href: '/managers' },
-    { label: 'Manage Receptionists', icon: UserCheck, href: '/receptionists' },
+    { label: 'Manage Receptionists', icon: UserCheck, href: '/admins/receptionists' },
     { label: 'Manage Clients', icon: Users, href: '/clients' },
     { label: 'Statistics', icon: BarChart3, href: '/statistics' },
     { label: 'Manage Rooms', icon: Bed, href: '/admins/rooms' },

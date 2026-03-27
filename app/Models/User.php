@@ -3,6 +3,8 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Cog\Contracts\Ban\Bannable as BannableContract;
+use Cog\Laravel\Ban\Traits\Bannable;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -11,8 +13,9 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable
+class User extends Authenticatable implements BannableContract
 {
+    use Bannable;
     use HasRoles;
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
@@ -36,6 +39,7 @@ class User extends Authenticatable
         'approved_by',
         'created_by',
         'last_login_at',
+        'banned_at',
     ];
 
     /**
@@ -62,6 +66,7 @@ class User extends Authenticatable
             'is_banned'      => 'boolean',
             'last_login_at'  => 'datetime',
             'country_id'     => 'integer',
+            'banned_at'      => 'datetime',
         ];
     }
 
@@ -116,5 +121,10 @@ class User extends Authenticatable
     public function approvedReservations(): HasMany
     {
         return $this->hasMany(Reservation::class, 'receptionist_id');
+    }
+
+    public function isCurrentlyBanned(): bool
+    {
+        return $this->isBanned() || (bool) $this->is_banned;
     }
 }
