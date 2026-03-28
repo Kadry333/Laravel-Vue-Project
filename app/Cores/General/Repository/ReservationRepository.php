@@ -65,7 +65,22 @@ class ReservationRepository implements ReservationRepositoryInterface
         }
 
         foreach ($conditions as $column => $value) {
-            $query->where($column, $value);
+            if ($value === null || $value === '') continue;
+
+            if ($column === 'search') {
+                $query->where(function ($q) use ($value) {
+                    $q->whereHas('client', function ($q) use ($value) {
+                        $q->where('name', 'like', "%{$value}%")
+                          ->orWhere('email', 'like', "%{$value}%");
+                    })->orWhereHas('room', function ($q) use ($value) {
+                        $q->where('number', 'like', "%{$value}%");
+                    })->orWhere('id', 'like', "%{$value}%");
+                });
+            } elseif ($column === 'status') {
+                $query->where('status', $value);
+            } else {
+                $query->where($column, $value);
+            }
         }
 
         $query->orderBy('created_at', 'desc');
