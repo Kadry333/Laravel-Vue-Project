@@ -14,7 +14,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
     Hotel, ChevronDown, Settings, LogOut,
     LayoutDashboard, UserCog, UserCheck, Users, BarChart3, Bed, Layers, Calendar
-    LayoutDashboard, UserCog, UserCheck, Users, BarChart3, Bed
 } from 'lucide-vue-next'
 import AdminNavItem from './AdminNavItem.vue'
 
