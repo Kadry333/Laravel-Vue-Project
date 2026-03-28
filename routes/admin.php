@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminDashboard\FloorController;
 use App\Http\Controllers\AdminDashboard\ManagerController;
 use App\Http\Controllers\AdminDashboard\ProfileController;
 use App\Http\Controllers\AdminDashboard\ReceptionistController;
@@ -10,14 +11,6 @@ use Inertia\Inertia;
 Route::middleware(['auth', 'logs-out-banned-user', 'role:admin|manager'])->group(function () {
     Route::get('/', fn () => Inertia::render('AdminDashboard/Admin'))->name('dashboard');
 
-    Route::prefix('rooms')->as('rooms.')->group(function () {
-        Route::get('/', [RoomController::class, 'index'])->name('index');
-        Route::get('/create', [RoomController::class, 'create'])->name('create');
-        Route::post('/', [RoomController::class, 'store'])->name('store');
-        Route::get('/{room}/edit', [RoomController::class, 'edit'])->name('edit');
-        Route::post('/{room}', [RoomController::class, 'update'])->name('update');
-        Route::delete('/{room}', [RoomController::class, 'destroy'])->name('destroy');
-    });
 
     Route::prefix('receptionists')->as('receptionists.')->group(function () {
         Route::get('/', [ReceptionistController::class, 'index'])->name('index');
@@ -46,3 +39,22 @@ Route::prefix('managers')->as('managers.')->group(function () {
     Route::post('/{manager}',       [ManagerController::class, 'update'])->name('update');
     Route::delete('/{manager}',     [ManagerController::class, 'destroy'])->name('destroy');
 });
+
+Route::prefix('floors')->as('floors.')->group(function () {
+    Route::get('/',                 [FloorController::class, 'index'])->name('index');
+    Route::get('/create',           [FloorController::class, 'create'])->name('create');
+    Route::post('/',                [FloorController::class, 'store'])->name('store');
+    Route::get('/{floor}',        [FloorController::class, 'show'])->name('show');
+    Route::get('/{floor}/edit',   [FloorController::class, 'edit'])->name('edit');
+    Route::post('/{floor}',       [FloorController::class, 'update'])->name('update');
+    Route::delete('/{floor}',     [FloorController::class, 'destroy'])->name('destroy');
+});
+
+    Route::prefix('rooms')->as('rooms.')->group(function () {
+        Route::get('/', [RoomController::class, 'index'])->name('index');
+        Route::get('/create', [RoomController::class, 'create'])->name('create');
+        Route::post('/', [RoomController::class, 'store'])->name('store');
+        Route::get('/{room}/edit', [RoomController::class, 'edit'])->name('edit');
+        Route::post('/{room}', [RoomController::class, 'update'])->name('update');
+        Route::delete('/{room}', [RoomController::class, 'destroy'])->name('destroy');
+    });

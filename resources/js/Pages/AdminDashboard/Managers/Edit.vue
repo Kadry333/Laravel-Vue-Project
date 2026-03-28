@@ -45,9 +45,6 @@ function submit() {
     form.post(`/admins/managers/${props.manager.id}`, {
         forceFormData: true,
         _method: 'PUT',
-        onSuccess: () => {
-            toast.success('Manager updated successfully')
-        },
     })
 }
 </script>

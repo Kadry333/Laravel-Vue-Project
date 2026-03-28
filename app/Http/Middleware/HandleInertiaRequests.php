@@ -5,6 +5,8 @@ namespace App\Http\Middleware;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
+use Illuminate\Support\Facades\Cache;
+use App\Models\Country;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -35,11 +37,18 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'auth' => [
+            'user' => fn () => $request->user()
+                ? $request->user()->load('roles')->toArray()
+                : null,
                 'user' => $user,
                 'primary_role' => $user ? $this->resolvePrimaryRole($user) : null,
                 'role_label' => $user ? ucfirst($this->resolvePrimaryRole($user)) : null,
                 'profile_route' => $user ? $this->resolveProfileRoute($user) : null,
             ],
+            // laravel cache to cache the drop down list of countries
+            'countries' => Cache::remember('all_countries', 86400, function () {
+                return Country::orderBy('official_name')->pluck('official_name')->toArray();
+            }),
             'flash' => [
                 'payment_success' => fn() => $request->session()->get('payment_success'),
                 'payment_cancelled' => fn() => $request->session()->get('payment_cancelled'),
