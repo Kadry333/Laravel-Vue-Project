@@ -29,9 +29,18 @@ class ReservationController extends Controller
         $this->stripePayment = $stripePayment;
     }
 
+    public function index()
+    {
+        $reservations = $this->reservationRepository->paginate(10, ['room'], ['client_id' => \Illuminate\Support\Facades\Auth::id()]);
+
+        return Inertia::render('ClientDashboard/Reservations/Index', [
+            'reservations' => $reservations
+        ]);
+    }
+
     public function create(CreateReservationRequest $request)
     {
-        $clientId = env("CLIENT_ID");
+        $clientId = \Illuminate\Support\Facades\Auth::id();
         $room = $this->roomRepository->find($request->room_id);
 
         $nights = \Carbon\Carbon::parse($request->check_in_date)

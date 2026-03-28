@@ -12,17 +12,18 @@ import {
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import {
     Hotel, ChevronDown, Settings, LogOut,
-    LayoutDashboard, UserCog, UserCheck, Users, BarChart3, Bed, Layers
+    LayoutDashboard, UserCog, UserCheck, Users, BarChart3, Bed, Layers, Calendar
 } from 'lucide-vue-next'
 import AdminNavItem from './AdminNavItem.vue'
 
 const navItems = [
     { label: 'Dashboard', icon: LayoutDashboard, href: '/admins' },
-    { label: 'Manage Managers', icon: UserCog, href: '/managers' },
+    { label: 'Manage Managers', icon: UserCog, href: '/admins/managers' },
     { label: 'Manage Receptionists', icon: UserCheck, href: '/admins/receptionists' },
-    { label: 'Manage Clients', icon: Users, href: '/clients' },
-    { label: 'Statistics', icon: BarChart3, href: '/statistics' },
+    { label: 'Manage Clients', icon: Users, href: '/admins/clients' },
+    { label: 'Statistics', icon: BarChart3, href: '/admins/statistics' },
     { label: 'Manage Rooms', icon: Bed, href: '/admins/rooms' },
+    { label: 'Manage Reservations', icon: Calendar, href: '/admins/reservations' },
 ]
 </script>
 
@@ -43,7 +44,7 @@ const navItems = [
                 </div>
                 <div>
                     <p class="font-serif text-[17px] font-semibold text-[#f0f6ff] tracking-wide leading-tight">
-                        LuxeStay
+                        Grand Luxury
                     </p>
                     <p class="text-[10px] text-[#5a7a96] mt-0.5">Hotel Management</p>
                 </div>

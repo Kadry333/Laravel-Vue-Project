@@ -52,12 +52,24 @@ class LoginRequest extends FormRequest
 
         $user = Auth::user();
 
+        // Check if user is banned
         if ($user && method_exists($user, 'isCurrentlyBanned') && $user->isCurrentlyBanned()) {
             Auth::logout();
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
                 'email' => 'Your account has been suspended. Please contact an administrator.',
+            ]);
+        }
+
+        $user->refresh(); // Force fresh data from DB
+
+        // Check if user is approved (Only applicable to Clients)
+        if ($user && $user->is_approved === false && $user->hasRole('client')) {
+            Auth::logout();
+            
+            throw ValidationException::withMessages([
+                'email' => 'Your account is pending approval by an administrator. Please try again later.',
             ]);
         }
 
