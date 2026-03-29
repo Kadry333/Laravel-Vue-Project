@@ -35,12 +35,27 @@ class RegisteredUserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'national_id' => 'required|string|unique:users,national_id',
+            'avatar_image' => 'nullable|image|mimes:jpg,jpeg|max:2048',
+            'country' => 'required|string',
+            'gender' => 'required|string|in:male,female',
         ]);
+
+        // Handle Avatar Upload
+        $avatarName = 'default.png';
+        if ($request->hasFile('avatar_image')) {
+            $avatarName = time() . '.' . $request->avatar_image->extension();
+            $request->avatar_image->move(public_path('avatars'), $avatarName);
+        }
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'national_id' => $request->national_id,
+            'avatar_image' => $avatarName,
+            'country' => $request->country,
+            'gender' => $request->gender,
             'is_approved' => false,
         ]);
 
@@ -49,8 +64,9 @@ class RegisteredUserController extends Controller
 
         event(new Registered($user));
 
-        Auth::login($user);
+        // Disable automatic login for pending approval
+        // Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
+        return redirect(route('login'))->with('status', 'Your account has been registered. Please wait for an administrator to approve your account before logging in.');
     }
 }
