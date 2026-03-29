@@ -1,6 +1,6 @@
 <script setup>
 import AdminLayout from '@/Layouts/AdminLayout.vue'
-import { ref, watch } from 'vue'
+import { ref, watch,computed } from 'vue'
 import { useForm, Link, router } from '@inertiajs/vue3'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -9,24 +9,30 @@ import {
     AlertDialogContent, AlertDialogDescription,
     AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { Pencil, Trash2, Plus, Building2, Users } from 'lucide-vue-next'
-import {
-    useVueTable,
-    getCoreRowModel,
-} from '@tanstack/vue-table'
+import { Pencil, Trash2, Plus, Building2, Users, UserCircle } from 'lucide-vue-next'
 
 defineOptions({ layout: AdminLayout })
 
 const props = defineProps({
-    rooms: Object,
-    filters: Object, 
+    rooms:    Object,
+    filters:  Object,
+    authUser: Object,
 })
 
-/* ================= DELETE ================= */
+/* ─────────────── helpers ─────────────── */
+const isAdmin   = computed(() => props.authUser?.role === 'admin')
+const isManager = computed(() => props.authUser?.role === 'manager')
+
+function canActOnRoom(room) {
+
+    if (isAdmin.value) return false
+    return room.manager_id === props.authUser?.id
+}
+
+/* ─────────────── delete ─────────────── */
 const openDelete = ref(false)
 const targetId   = ref(null)
-
-const form = useForm({})
+const form       = useForm({})
 
 function confirmDelete(id) {
     targetId.value   = id
@@ -36,69 +42,45 @@ function confirmDelete(id) {
 function destroy() {
     form.transform(() => ({ _method: 'DELETE' }))
         .post(`/admins/rooms/${targetId.value}`, {
-            onSuccess: () => { openDelete.value = false }
+            onSuccess: () => { openDelete.value = false },
         })
 }
 
-/* ================= STATE ================= */
-const search = ref(props.filters?.search || '')
-const sorting = ref(props.filters?.sort || 'id')
+/* ─────────────── state ─────────────── */
+const search    = ref(props.filters?.search    || '')
+const sorting   = ref(props.filters?.sort      || 'id')
 const direction = ref(props.filters?.direction || 'asc')
 
-/* ================= FETCH ================= */
+/* ─────────────── fetch ─────────────── */
 function fetchData(extra = {}) {
     router.get('/admins/rooms', {
-        search: search.value,
-        sort: sorting.value,
+        search:    search.value,
+        sort:      sorting.value,
         direction: direction.value,
-        ...extra
+        ...extra,
     }, {
         preserveState: true,
-        replace: true
+        replace: true,
     })
 }
 
-/* ================= SEARCH ================= */
-watch(search, (val) => {
-    fetchData({ page: 1 })
-})
+watch(search, () => fetchData({ page: 1 }))
 
-/* ================= SORT ================= */
+/* ─────────────── sort ─────────────── */
 function changeSort(column) {
     if (sorting.value === column) {
         direction.value = direction.value === 'asc' ? 'desc' : 'asc'
     } else {
-        sorting.value = column
+        sorting.value   = column
         direction.value = 'asc'
     }
     fetchData()
 }
 
-/* ================= TABLE ================= */
-const table = useVueTable({
-    data: props.rooms.data,
-    columns: [
-        {
-            accessorKey: 'number',
-            header: () => 'Room',
-        },
-        {
-            accessorKey: 'floor.name',
-            header: () => 'Floor',
-        },
-        {
-            accessorKey: 'capacity',
-            header: () => 'Capacity',
-        },
-        {
-            accessorKey: 'price',
-            header: () => 'Price',
-        },
-    ],
-    getCoreRowModel: getCoreRowModel(),
-    manualPagination: true,
-    pageCount: props.rooms.last_page,
-})
+function sortIcon(column) {
+    if (sorting.value !== column) return '↕'
+    return direction.value === 'asc' ? '↑' : '↓'
+}
 </script>
 
 <template>
@@ -112,7 +94,8 @@ const table = useVueTable({
             </p>
         </div>
 
-        <Link href="/admins/rooms/create">
+        <!-- Only managers can add rooms -->
+        <Link v-if="isManager" href="/admins/rooms/create">
             <Button>
                 <Plus class="w-4 h-4 mr-2" /> Add Room
             </Button>
@@ -132,26 +115,37 @@ const table = useVueTable({
     <div class="bg-white rounded-xl border shadow-sm overflow-hidden">
         <table class="w-full text-sm">
             <thead>
-                <tr class="bg-slate-50 border-b">
-
-                    <th @click="changeSort('number')" class="cursor-pointer px-5 py-3">
-                        Room
+                <tr class="bg-slate-50 border-b text-left">
+                    <th @click="changeSort('number')"
+                        class="cursor-pointer px-5 py-3 select-none">
+                        Room {{ sortIcon('number') }}
                     </th>
 
-                    <th @click="changeSort('floor')" class="cursor-pointer px-5 py-3">
-                        Floor
+                    <th @click="changeSort('floor')"
+                        class="cursor-pointer px-5 py-3 select-none">
+                        Floor {{ sortIcon('floor') }}
                     </th>
 
-                    <th @click="changeSort('capacity')" class="cursor-pointer px-5 py-3">
-                        Capacity
+                    <th @click="changeSort('capacity')"
+                        class="cursor-pointer px-5 py-3 select-none">
+                        Capacity {{ sortIcon('capacity') }}
                     </th>
 
-                    <th @click="changeSort('price')" class="cursor-pointer px-5 py-3">
-                        Price
+                    <th @click="changeSort('price')"
+                        class="cursor-pointer px-5 py-3 select-none">
+                        Price {{ sortIcon('price') }}
                     </th>
 
                     <th class="px-5 py-3">Status</th>
-                    <th class="px-5 py-3"></th>
+
+                    <th v-if="isAdmin" class="px-5 py-3">
+                        <div class="flex items-center gap-1.5">
+                            <UserCircle class="w-3.5 h-3.5" />
+                            Manager Name
+                        </div>
+                    </th>
+
+                    <th v-if="isManager" class="px-5 py-3"></th>
                 </tr>
             </thead>
 
@@ -165,18 +159,19 @@ const table = useVueTable({
 
                     <td class="px-5 py-4">
                         <div class="flex items-center gap-1.5">
-                            <Building2 class="w-3.5 h-3.5" />
-                            {{ room.floor.name }}
+                            <Building2 class="w-3.5 h-3.5 text-slate-400" />
+                            {{ room.floor?.name }}
                         </div>
                     </td>
 
                     <td class="px-5 py-4">
                         <div class="flex items-center gap-1.5">
-                            <Users class="w-3.5 h-3.5" />
+                            <Users class="w-3.5 h-3.5 text-slate-400" />
                             {{ room.capacity }} guests
                         </div>
                     </td>
 
+                    <!-- Price stored in cents, displayed in dollars -->
                     <td class="px-5 py-4 font-semibold">
                         ${{ (room.price / 100).toFixed(2) }}
                     </td>
@@ -187,8 +182,14 @@ const table = useVueTable({
                         </Badge>
                     </td>
 
-                    <td class="px-5 py-4">
-                        <div class="flex gap-2 justify-end">
+
+                    <td v-if="isAdmin" class="px-5 py-4 text-slate-600">
+                        {{ room.manager?.name ?? '—' }}
+                    </td>
+
+                    <!-- Actions: only for the manager who owns this room -->
+                    <td v-if="isManager" class="px-5 py-4">
+                        <div v-if="canActOnRoom(room)" class="flex gap-2 justify-end">
                             <Link :href="`/admins/rooms/${room.id}/edit`">
                                 <Button variant="outline" size="icon">
                                     <Pencil class="w-3.5 h-3.5" />
@@ -197,7 +198,8 @@ const table = useVueTable({
 
                             <Button
                                 variant="outline"
-                                class="text-red-500"
+                                size="icon"
+                                class="text-red-500 hover:text-red-600"
                                 @click="confirmDelete(room.id)"
                             >
                                 <Trash2 class="w-3.5 h-3.5" />
@@ -205,12 +207,22 @@ const table = useVueTable({
                         </div>
                     </td>
                 </tr>
+
+                <!-- Empty state -->
+                <tr v-if="props.rooms.data.length === 0">
+                    <td
+                        :colspan="isAdmin ? 6 : (isManager ? 6 : 5)"
+                        class="px-5 py-10 text-center text-slate-400"
+                    >
+                        No rooms found.
+                    </td>
+                </tr>
             </tbody>
         </table>
     </div>
 
     <!-- PAGINATION -->
-    <div class="flex justify-between mt-4">
+    <div class="flex items-center justify-between mt-4">
         <Button
             :disabled="!props.rooms.prev_page_url"
             @click="fetchData({ page: props.rooms.current_page - 1 })"
@@ -218,7 +230,7 @@ const table = useVueTable({
             Prev
         </Button>
 
-        <span>
+        <span class="text-sm text-slate-600">
             Page {{ props.rooms.current_page }} of {{ props.rooms.last_page }}
         </span>
 
@@ -243,7 +255,7 @@ const table = useVueTable({
             <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction
-                    class="bg-red-500"
+                    class="bg-red-500 hover:bg-red-600"
                     @click="destroy"
                 >
                     Delete

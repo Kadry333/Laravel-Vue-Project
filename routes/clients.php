@@ -18,18 +18,17 @@ Route::get('/', function () {
     ]);
 });
 
-
-Route::prefix('rooms')->as('rooms.')->group(function () {
+Route::prefix('rooms')->middleware(['auth', 'role:client'])->as('rooms.')->group(function () {
 
     Route::get('/', [RoomController::class , 'index'])->name('index');
 });
 
-Route::prefix('reservation')->as('reservation.')->group(function () {
+Route::prefix('reservation')->middleware(['auth', 'role:client'])->as('reservation.')->group(function () {
 
     Route::get('/', [ReservationController::class , 'index'])->name('index');
     Route::post('/create', [ReservationController::class , 'create'])->name('create');
-    Route::get('/success', [ReservationController::class , 'success'])->name('success');
-    Route::get('/cancel', [ReservationController::class , 'cancel'])->name('cancel');
+    Route::get('/success', [ReservationController::class , 'success'])->withoutMiddleware(['auth', 'role:client'])->name('success');
+    Route::get('/cancel', [ReservationController::class , 'cancel'])->withoutMiddleware(['auth', 'role:client'])->name('cancel');
 
 
 });

@@ -1,5 +1,5 @@
 <script setup>
-import ClientLayout from '@/Layouts/ClientLayout.vue'
+import AdminLayout from '@/Layouts/AdminLayout.vue'
 import { ref, computed, onMounted } from 'vue'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useForm, usePage, Link } from '@inertiajs/vue3'
 
-defineOptions({ layout: ClientLayout })
+defineOptions({ layout: AdminLayout })
 
 const props = defineProps({ rooms: Array })
 
