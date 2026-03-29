@@ -3,12 +3,19 @@
 use App\Http\Controllers\ClientDashboard\ReservationController;
 use App\Http\Controllers\ClientDashboard\RoomController;
 use App\Http\Controllers\ClientDashboard\ProfileController;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
 
-    return Inertia::render('AdminDashboard/Admin');
+    $clients = User::with('country')->role('client')->get();
+    $receptionists = User::role('receptionist')->get();
+
+    return Inertia::render('ClientDashboard/ClientDashboard', [
+        'clients' => $clients,
+        'receptionists' => $receptionists
+    ]);
 });
 
 Route::prefix('rooms')->as('rooms.')->group(function () {

@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminDashboard\FloorController;
 use App\Http\Controllers\AdminDashboard\ManagerController;
 use App\Http\Controllers\AdminDashboard\ReceptionistController;
 use App\Http\Controllers\AdminDashboard\RoomController;
+use App\Http\Controllers\AdminDashboard\StatisticsController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -52,3 +53,5 @@ Route::prefix('floors')->as('floors.')->group(function () {
         Route::post('/{room}', [RoomController::class, 'update'])->name('update');
         Route::delete('/{room}', [RoomController::class, 'destroy'])->name('destroy');
     });
+
+Route::get('/dashboard', [StatisticsController::class, 'index'])->name('index');

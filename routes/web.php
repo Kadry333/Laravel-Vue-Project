@@ -17,7 +17,15 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
+
+    $user = Auth::user();
+
+    if ($user->hasRole('client')) {
+        return redirect('/client');
+    }
+
+    return redirect('/admins/dashboard');
+
 })->middleware(['auth', 'logs-out-banned-user', 'verified'])->name('dashboard');
 
 Route::middleware(['auth', 'logs-out-banned-user'])->group(function () {
