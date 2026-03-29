@@ -19,14 +19,14 @@ const props = defineProps({
 const form = useForm({
     number:   props.room.number,
     capacity: props.room.capacity,
-    price:    props.room.price / 100,
+    price:    props.room.price ,
     floor_id: String(props.room.floor_id),
 })
 
 function submit() {
     form.transform(data => ({
         ...data,
-        price:   data.price * 100
+        price:   data.price
     })).post(`/admins/rooms/${props.room.id}`)
 }
 </script>

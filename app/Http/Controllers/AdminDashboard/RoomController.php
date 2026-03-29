@@ -7,6 +7,7 @@ use App\Cores\General\RepositoryInterfaces\RoomRepositoryInterface;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreRoomRequest;
 use App\Http\Requests\Admin\UpdateRoomRequest;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class RoomController extends Controller
@@ -27,14 +28,18 @@ class RoomController extends Controller
         $filters = request()->only(['search', 'sort', 'direction']);
 
         return Inertia::render('AdminDashboard/Rooms/Index', [
-            'rooms'  => $this->roomRepository->paginate(
+            'rooms'   => $this->roomRepository->paginate(
                 5,
-                ['floor'],
+                ['floor', 'manager'],
                 [],
                 $filters
             ),
             'filters' => $filters,
-            'floors' => $this->floorRepository->get(),
+            'floors'  => $this->floorRepository->get(),
+            'authUser' => [
+                'id'   => auth()->id(),
+                'role' => auth()->user()->getRoleNames()->first(),
+            ],
         ]);
     }
 
@@ -55,13 +60,12 @@ class RoomController extends Controller
 
     public function store(StoreRoomRequest $request)
     {
-        $managerId = 1;
         $this->roomRepository->store([
             'number'     => $request->number,
             'capacity'   => $request->capacity,
-            'price'      => $request->price,
+            'price'      => $request->price, // store in cents
             'floor_id'   => $request->floor_id,
-            'manager_id' => $managerId,
+            'manager_id' => auth()->id(),
         ]);
 
         return redirect()->route('admins.rooms.index')
@@ -73,7 +77,7 @@ class RoomController extends Controller
         $this->roomRepository->update($id, [
             'number'   => $request->number,
             'capacity' => $request->capacity,
-            'price'    => $request->price * 100,
+            'price'    => $request->price, // store in cents
             'floor_id' => $request->floor_id,
         ]);
 
@@ -83,7 +87,15 @@ class RoomController extends Controller
 
     public function destroy($id)
     {
+        $room = $this->roomRepository->find($id, ['reservations']);
+
+        
+        if ($room->reservations && $room->reservations->isNotEmpty()) {
+            return back()->with('error', 'Cannot delete a room that is currently reserved.');
+        }
+
         $this->roomRepository->delete(['id' => $id]);
+
         return back()->with('success', 'Room deleted successfully.');
     }
 }

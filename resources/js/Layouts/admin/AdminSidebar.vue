@@ -13,55 +13,52 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
     Hotel, ChevronDown, Settings, LogOut,
-    LayoutDashboard, UserCog, UserCheck, Users, BarChart3, Bed, Layers, Calendar
+    LayoutDashboard, UserCog, UserCheck, Users, BarChart3, Bed, CalendarPlus
 } from 'lucide-vue-next'
 import AdminNavItem from './AdminNavItem.vue'
 
-const navItems = [
-    { label: 'Dashboard', icon: LayoutDashboard, href: '/admins' },
-    { label: 'Manage Managers', icon: UserCog, href: '/admins/managers' },
-    { label: 'Manage Receptionists', icon: UserCheck, href: '/admins/receptionists' },
-    { label: 'Manage Clients', icon: Users, href: '/admins/clients' },
-    { label: 'Statistics', icon: BarChart3, href: '/admins/statistics' },
-    { label: 'Manage Rooms', icon: Bed, href: '/admins/rooms' },
-    { label: 'Manage Reservations', icon: Calendar, href: '/admins/reservations' },
+const page = usePage()
+
+const authUser = computed(() => page.props.auth?.user)
+
+const userRoles = computed(() =>
+    new Set((authUser.value?.roles ?? []).map(r => r.name))
+)
+
+const hasRole = (role) => userRoles.value.has(role)
+
+const allNavItems = [
+    { label: 'Dashboard',            icon: LayoutDashboard, href: '/admins',               roles: ['admin'] },
+    { label: 'Manage Managers',      icon: UserCog,         href: '/managers',             roles: ['admin'] },
+    { label: 'Manage Receptionists', icon: UserCheck,       href: '/admins/receptionists', roles: ['admin'] },
+    { label: 'Manage Clients',       icon: Users,           href: '/clients',              roles: ['admin'] },
+    { label: 'Statistics',           icon: BarChart3,       href: '/statistics',           roles: ['admin'] },
+    { label: 'Manage Rooms',         icon: Bed,             href: '/admins/rooms',         roles: ['admin', 'manager'] },
+    { label: 'Make Reservation',     icon: CalendarPlus,    href: '/client/rooms',         roles: ['client'] },
 ]
 
-const page = usePage()
-const DEFAULT_AVATAR_PATH = '/images/default.png'
 
-const authUser = computed(() => page.props.auth?.user ?? null)
+const navItems = computed(() =>
+    allNavItems.filter(item =>
+        !item.roles || item.roles.some(role => userRoles.value.has(role))
+    )
+)
 
-const profileHref = computed(() => page.props.auth?.profile_route ?? '/profile')
 
-const avatarSrc = computed(() => {
-    const path = authUser.value?.avatar_image
-
-    if (!path || path === 'default.png') {
-        return DEFAULT_AVATAR_PATH
-    }
-
-    if (
-        path.startsWith('http://') ||
-        path.startsWith('https://') ||
-        path.startsWith('/')
-    ) {
-        return path
-    }
-
-    return `/storage/${path}`
+const userName = computed(() => authUser.value?.name ?? 'User')
+const userEmail = computed(() => authUser.value?.email ?? '')
+const userInitials = computed(() => {
+    const parts = userName.value.trim().split(' ')
+    return parts.length >= 2
+        ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+        : userName.value.slice(0, 2).toUpperCase()
 })
-
-const initials = computed(() => {
-    const name = authUser.value?.name ?? 'John Doe'
-
-    return name
-        .split(' ')
-        .map((part) => part[0] ?? '')
-        .join('')
-        .slice(0, 2)
-        .toUpperCase()
-})
+const roleLabel = computed(() =>
+    hasRole('admin')        ? 'Administrator' :
+    hasRole('manager')      ? 'Manager'       :
+    hasRole('receptionist') ? 'Receptionist'  :
+    hasRole('client')       ? 'Client'        : 'User'
+)
 </script>
 
 <template>
@@ -73,6 +70,7 @@ const initials = computed(() => {
         '--sidebar-accent-foreground': '#38bdf8',
         '--sidebar-primary': '#0ea5e9',
     }">
+        <!-- ── Logo ── -->
         <SidebarHeader class="px-4 py-5 border-b border-white/5">
             <div class="flex items-center gap-3">
                 <div class="w-9 h-9 rounded-[10px] shrink-0 bg-gradient-to-br from-sky-500 to-sky-300
@@ -88,34 +86,41 @@ const initials = computed(() => {
             </div>
         </SidebarHeader>
 
+        <!-- ── Nav ── -->
         <SidebarContent class="px-3 pt-2">
             <SidebarGroup>
                 <SidebarGroupLabel class="text-[9.5px] font-bold uppercase tracking-[1.2px]
-                                  text-[rgba(90,122,150,0.6)] px-1.5 pb-1 pt-2">
+                                          text-[rgba(90,122,150,0.6)] px-1.5 pb-1 pt-2">
                     Navigation
                 </SidebarGroupLabel>
                 <SidebarMenu>
-                    <AdminNavItem v-for="item in navItems" :key="item.href" :label="item.label" :icon="item.icon"
-                        :href="item.href" />
+                    <AdminNavItem
+                        v-for="item in navItems"
+                        :key="item.href"
+                        :label="item.label"
+                        :icon="item.icon"
+                        :href="item.href"
+                    />
                 </SidebarMenu>
             </SidebarGroup>
         </SidebarContent>
 
+        <!-- ── User footer ── -->
         <SidebarFooter class="p-3 border-t border-white/5">
             <DropdownMenu>
                 <DropdownMenuTrigger as-child>
                     <button class="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-[9px]
-                         hover:bg-[#162840] transition-colors duration-150 text-left">
+                                   hover:bg-[#162840] transition-colors duration-150 text-left">
                         <Avatar class="w-[34px] h-[34px] shrink-0">
                             <AvatarImage :src="avatarSrc" :alt="authUser?.name ?? 'User'" class="object-cover" />
                             <AvatarFallback class="text-[12px] font-bold text-white"
                                 style="background: linear-gradient(135deg,#8b5cf6,#ec4899)">
-                                {{ initials }}
+                                {{ userInitials }}
                             </AvatarFallback>
                         </Avatar>
                         <div class="flex-1 min-w-0">
-                            <p class="text-[12.5px] font-semibold text-[#dde8f0] truncate">{{ authUser?.name ?? 'John Doe' }}</p>
-                            <p class="text-[11px] text-[#5a7a96] mt-0.5">{{ page.props.auth?.role_label ?? 'Administrator' }}</p>
+                            <p class="text-[12.5px] font-semibold text-[#dde8f0] truncate">{{ userName }}</p>
+                            <p class="text-[11px] text-[#5a7a96] mt-0.5">{{ roleLabel }}</p>
                         </div>
                         <ChevronDown class="w-3.5 h-3.5 text-[#3a5a76] shrink-0" />
                     </button>
@@ -123,8 +128,8 @@ const initials = computed(() => {
 
                 <DropdownMenuContent side="top" align="start" class="w-56 mb-1">
                     <DropdownMenuLabel class="font-normal">
-                        <p class="text-[13px] font-semibold">{{ authUser?.name ?? 'John Doe' }}</p>
-                        <p class="text-[11.5px] text-muted-foreground">{{ authUser?.email ?? 'john@luxestay.com' }}</p>
+                        <p class="text-[13px] font-semibold">{{ userName }}</p>
+                        <p class="text-[11.5px] text-muted-foreground">{{ userEmail }}</p>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem as-child>

@@ -13,20 +13,18 @@ use Inertia\Inertia;
 
 class ReservationController extends Controller
 {
-
     private ReservationRepositoryInterface $reservationRepository;
     private RoomRepositoryInterface $roomRepository;
     private StripePaymentContract $stripePayment;
 
     public function __construct(
-        ReservationRepositoryInterface  $reservationRepository,
+        ReservationRepositoryInterface $reservationRepository,
         RoomRepositoryInterface $roomRepository,
         StripePaymentContract $stripePayment
     ) {
-
         $this->reservationRepository = $reservationRepository;
-        $this->roomRepository = $roomRepository;
-        $this->stripePayment = $stripePayment;
+        $this->roomRepository        = $roomRepository;
+        $this->stripePayment         = $stripePayment;
     }
 
     public function index()
@@ -40,14 +38,13 @@ class ReservationController extends Controller
 
     public function create(CreateReservationRequest $request)
     {
-        $clientId = \Illuminate\Support\Facades\Auth::id();
         $room = $this->roomRepository->find($request->room_id);
 
         $nights = \Carbon\Carbon::parse($request->check_in_date)
             ->diffInDays(\Carbon\Carbon::parse($request->check_out_date));
 
         $reservation = $this->reservationRepository->store([
-            'client_id'        => $clientId,
+            'client_id'        => auth()->id(),
             'room_id'          => $request->room_id,
             'accompany_number' => $request->accompany_number,
             'paid_price'       => $room->price * $nights,
@@ -56,30 +53,33 @@ class ReservationController extends Controller
             'check_out_date'   => $request->check_out_date,
         ]);
 
-        $session = $this->stripePayment->createCheckoutSession($reservation->id, $reservation->paid_price);
+        $session = $this->stripePayment->createCheckoutSession(
+            $reservation->id,
+            $reservation->paid_price
+        );
 
         $reservation->update(['payment_session_id' => $session->id]);
 
         return Inertia::location($session->url);
     }
 
-
     public function success(SuccessReservationRequest $request)
     {
-        $sessionId = $request->session_id;
-        $reservation = $this->reservationRepository->first(['payment_session_id' => $sessionId]);
-        $reservation->update([
-            'status' => ReservationStatus::APPROVED,
+        $reservation = $this->reservationRepository->first([
+            'payment_session_id' => $request->session_id,
         ]);
+
+        $reservation->update(['status' => ReservationStatus::APPROVED]);
 
         return redirect()->route('client.rooms.index')->with('payment_success', [
             'order_id' => $reservation->id,
-            'amount' => $reservation->paid_price,
+            'amount'   => number_format($reservation->paid_price / 100, 2),
         ]);
     }
 
     public function cancel()
     {
-        return redirect()->route('client.rooms.index')->with('payment_cancelled', true);
+        return redirect()->route('client.rooms.index')
+            ->with('payment_cancelled', true);
     }
 }
