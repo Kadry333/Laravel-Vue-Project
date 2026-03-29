@@ -52,20 +52,13 @@ class ClientController extends Controller
             $query->where('gender', $request->gender);
         }
 
-        $allowed = ['name', 'email', 'gender'];
-        if ($request->filled('sort_by') && in_array($request->sort_by, $allowed)) {
-            $query->orderBy($request->sort_by, $request->sort_dir === 'desc' ? 'desc' : 'asc');
-        } else {
-            $query->latest();
-        }
-
-        $clients   = $query->paginate(10)->withQueryString();
+           $clients   = $query->latest()->paginate(10)->withQueryString();
         $countries = $this->getCountries();
 
         return Inertia::render('AdminDashboard/Clients/Index', [
             'clients'   => $clients,
             'countries' => $countries,
-            'filters'   => $request->only(['search', 'country_id', 'gender', 'status', 'sort_by', 'sort_dir']),
+            'filters'   => $request->only(['search', 'country_id', 'gender', 'status']),
             'canCreate' => $user->hasAnyRole(['admin', 'manager']),
             'canDelete' => $user->hasRole('admin'),
             'role'      => $user->getRoleNames()->first(),
@@ -134,15 +127,9 @@ class ClientController extends Controller
 
         $data = $request->validated();
 
-       
         if ($request->hasFile('avatar_image')) {
-            $file = $request->file('avatar_image');
-
-            $filename = time() . '_' . $file->getClientOriginalName();
-
-            $file->storeAs('avatars', $filename, 'public');
-
-            $data['avatar_image'] = $filename; 
+            $data['avatar_image'] = $request->file('avatar_image')
+                ->store('avatars', 'public');
         } else {
             unset($data['avatar_image']);
         }
@@ -206,20 +193,14 @@ class ClientController extends Controller
             $query->where('gender', $request->gender);
         }
 
-        $allowed = ['name', 'email', 'gender'];
-        if ($request->filled('sort_by') && in_array($request->sort_by, $allowed)) {
-            $query->orderBy($request->sort_by, $request->sort_dir === 'desc' ? 'desc' : 'asc');
-        } else {
-            $query->latest();
-        }
+                $clients   = $query->latest()->paginate(10)->withQueryString();
 
-        $clients   = $query->paginate(10)->withQueryString();
         $countries = $this->getCountries();
 
         return Inertia::render('AdminDashboard/Clients/Index', [
             'clients'   => $clients,
             'countries' => $countries,
-            'filters'   => $request->only(['search', 'country_id', 'gender', 'sort_by', 'sort_dir']),
+            'filters'   => $request->only(['search', 'country_id', 'gender']),
             'canCreate' => false,
             'canDelete' => false,
             'role'      => $user->getRoleNames()->first(),

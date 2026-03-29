@@ -47,8 +47,8 @@ function submit() {
                 <ArrowLeft class="w-4 h-4" />
             </button>
             <div>
-                <h1 class="text-2xl font-semibold text-gray-800">Add New Client</h1>
-                <p class="text-sm text-gray-400 mt-0.5">Fill in the details to create a new client.</p>
+                <h1 class="text-2xl font-bold text-slate-900">Add New Client</h1>
+                <p class="text-sm text-slate-500 mt-1">Fill in the details to create a new client.</p>
             </div>
         </div>
 
@@ -62,11 +62,9 @@ function submit() {
                     <div class="flex items-center gap-4">
                         <div class="w-20 h-20 rounded-full bg-gray-100 border border-gray-200 overflow-hidden flex items-center justify-center flex-shrink-0">
                             <img
-                                v-if="previewUrl"
-                                :src="previewUrl"
-                                class="w-full h-full object-cover"
-                            />
-                            <span v-else class="text-gray-300 text-3xl">👤</span>
+    :src="previewUrl || '/images/default.png'"
+    class="w-full h-full object-cover"
+/>
                         </div>
                         <div>
                             <input
