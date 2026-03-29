@@ -24,14 +24,16 @@ Route::prefix('rooms')->middleware(['auth', 'role:client'])->as('rooms.')->group
 });
 
 Route::prefix('reservation')->middleware(['auth', 'role:client'])->as('reservation.')->group(function () {
-
-    Route::get('/', [ReservationController::class , 'index'])->name('index');
-    Route::post('/create', [ReservationController::class , 'create'])->name('create');
-    Route::get('/success', [ReservationController::class , 'success'])->withoutMiddleware(['auth', 'role:client'])->name('success');
-    Route::get('/cancel', [ReservationController::class , 'cancel'])->withoutMiddleware(['auth', 'role:client'])->name('cancel');
-
-
+    Route::get('/', [ReservationController::class, 'index'])->name('index');
+    Route::post('/create', [ReservationController::class, 'create'])->name('create');
 });
+
+Route::prefix('reservation')->as('reservation.')->group(function () {
+    Route::get('/success', [ReservationController::class, 'success'])->name('success');
+    Route::get('/cancel', [ReservationController::class, 'cancel'])->name('cancel');
+    Route::post('/stripe/webhook', [ReservationController::class, 'handle'])->name('stripe.webhook');
+});
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class , 'edit'])->name('profile.edit');

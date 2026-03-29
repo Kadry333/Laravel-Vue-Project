@@ -10,6 +10,11 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateReservationRequest;
 use App\Http\Requests\SuccessReservationRequest;
 use Inertia\Inertia;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Stripe\Stripe;
+use Stripe\Webhook;
+use Stripe\Exception\SignatureVerificationException;
 
 class ReservationController extends Controller
 {
@@ -81,5 +86,45 @@ class ReservationController extends Controller
     {
         return redirect()->route('client.rooms.index')
             ->with('payment_cancelled', true);
+    }
+
+
+
+    public function handle(Request $request)
+    {
+
+        Log::info('Stripe Webhook: 1', $request->all());
+        Stripe::setApiKey(config('services.stripe.secret'));
+
+        try {
+            $event = Webhook::constructEvent(
+                $request->getContent(),
+                $request->header('Stripe-Signature'),
+                config('services.stripe.webhook_secret')
+            );
+        } catch (SignatureVerificationException | \UnexpectedValueException $e) {
+            return response('Invalid request', 400);
+        }
+
+        $session = $event->data->object;
+
+        $reservation = $this->reservationRepository->first([
+            'payment_session_id' => $session->id,
+        ]);
+
+        if (!$reservation) {
+            return response('Not found', 404);
+        }
+        Log::info('Stripe Webhook: 2', $request->all());
+        $status = match ($event->type) {
+            'checkout.session.completed' => ReservationStatus::APPROVED,
+            default                      => ReservationStatus::PENDING,
+        };
+
+        if ($status) {
+            $this->reservationRepository->update($reservation->id, ['status' => $status]);
+        }
+        Log::info('Stripe Webhook: 3', $request->all());
+        return response('OK', 200);
     }
 }
