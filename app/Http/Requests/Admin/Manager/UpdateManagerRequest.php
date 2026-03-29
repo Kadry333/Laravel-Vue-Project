@@ -43,7 +43,9 @@ class UpdateManagerRequest extends FormRequest
             ],
             'national_id' => [
                 'required',
-                'string',
+                'numeric',
+                'digits:14',
+                'starts_with:2,3',
                 Rule::unique('users', 'national_id')->ignore($id),
             ],
             'password' => ['nullable', Password::min(6)],

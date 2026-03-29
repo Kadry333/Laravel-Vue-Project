@@ -32,7 +32,13 @@ class StoreFloorRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|unique:floors,name|string|min:3|max:255',
+            'name' => [
+                'required',
+                'unique:floors,name',
+                'min:3',
+                'max:255',
+                'regex:/^[A-Za-z]+$/'
+            ],
             'manager_id' => [
                 'required',
                 'numeric',

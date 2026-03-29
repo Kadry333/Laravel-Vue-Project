@@ -13,7 +13,9 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
     Hotel, ChevronDown, Settings, LogOut,
-    LayoutDashboard, UserCog, UserCheck, Users, BarChart3, Bed, CalendarPlus
+    LayoutDashboard, UserCog, UserCheck, Users, BarChart3, Bed, CalendarPlus,
+    FileStack,
+    Building2
 } from 'lucide-vue-next'
 import AdminNavItem from './AdminNavItem.vue'
 
@@ -28,13 +30,13 @@ const userRoles = computed(() =>
 const hasRole = (role) => userRoles.value.has(role)
 
 const allNavItems = [
-    { label: 'Dashboard',            icon: LayoutDashboard, href: '/admins',               roles: ['admin'] },
+    { label: 'Dashboard',            icon: LayoutDashboard, href: '/admins/dashboard',               roles: ['admin', 'manager', 'receptionist'] },
     { label: 'Manage Managers',      icon: UserCog,         href: '/admins/managers',             roles: ['admin'] },
     { label: 'Manage Receptionists', icon: UserCheck,       href: '/admins/receptionists', roles: ['admin', 'manager'] },
     { label: 'Manage Clients',       icon: Users,           href: '/admins/clients',              roles: ['admin', 'manager', 'receptionist'] },
-    { label: 'Statistics',           icon: BarChart3,       href: '/statistics',           roles: ['admin'] },
-    { label: 'Manage Rooms',         icon: Bed,             href: '/admins/rooms',         roles: ['admin', 'manager'] },
-    { label: 'Make Reservation',     icon: CalendarPlus,    href: '/client/rooms',         roles: ['client'] },
+    { label: 'Manage Floors',        icon: Building2,       href: '/admins/floors',               roles: ['admin', 'manager'] },
+    { label: 'Manage Rooms',         icon: Bed,             href: '/admins/rooms',                roles: ['admin', 'manager'] },
+    { label: 'Make Reservation',     icon: CalendarPlus,    href: '/client/rooms',                roles: ['client'] },
 ]
 
 

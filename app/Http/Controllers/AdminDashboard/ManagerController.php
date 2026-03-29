@@ -69,6 +69,8 @@ class ManagerController extends Controller
             $manager->avatar_image = $path;
         }
 
+        $manager->save();
+
         return redirect()->route('admins.managers.index')
             ->with('success', 'Manager updated successfully.');
     }

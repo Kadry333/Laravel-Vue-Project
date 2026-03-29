@@ -4,6 +4,7 @@ namespace App\Http\Requests\Admin\Manager;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreManagerRequest extends FormRequest
 {
@@ -32,11 +33,17 @@ class StoreManagerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
+            'name' => ['required', 'string', 'max:255', 'regex:/^[A-Za-z]+$/'],
             'email' => 'required|email|unique:users,email',
-            'national_id' => 'required|string|unique:users,national_id',
+            'national_id' => [
+                'required',
+                'numeric',
+                'digits:14',
+                'starts_with:2,3',
+                Rule::unique('users', 'national_id')
+            ],
             'password' => 'required|min:6',
-            'avatar_image' => 'nullable|image|mimes:jpg,jpeg,png',
+            'avatar_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ];
     }
 }
