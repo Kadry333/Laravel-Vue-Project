@@ -76,3 +76,22 @@ Route::middleware(['auth', 'logs-out-banned-user', 'role:admin|manager|reception
         Route::patch('/{client}/toggle-approval', [ClientController::class, 'toggleApproval'])->name('toggle-approval');
     });
 });
+
+// ======================== Manage Clients ====================
+
+Route::middleware(['auth', 'role:admin|manager|receptionist'])
+
+    ->group(function () {
+
+        Route::prefix('clients')->name('clients.')->group(function () {
+            Route::get('/',                   [ClientController::class, 'index'])->name('index');
+            Route::get('/create',             [ClientController::class, 'create'])->name('create');
+            Route::post('/',                  [ClientController::class, 'store'])->name('store');
+            Route::get('/approved',           [ClientController::class, 'approvedClients'])->name('approved');
+            Route::get('/{client}/edit',      [ClientController::class, 'edit'])->name('edit');
+            Route::post('/{client}/update', [ClientController::class, 'update'])->name('update');
+            Route::delete('/{client}',        [ClientController::class, 'destroy'])->name('destroy');
+            Route::patch('/{client}/approve', [ClientController::class, 'approve'])->name('approve');
+        });
+
+    });

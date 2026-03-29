@@ -29,9 +29,9 @@ const hasRole = (role) => userRoles.value.has(role)
 
 const allNavItems = [
     { label: 'Dashboard',            icon: LayoutDashboard, href: '/admins',               roles: ['admin'] },
-    { label: 'Manage Managers',      icon: UserCog,         href: '/managers',             roles: ['admin'] },
+    { label: 'Manage Managers',      icon: UserCog,         href: '/admins/managers',             roles: ['admin'] },
     { label: 'Manage Receptionists', icon: UserCheck,       href: '/admins/receptionists', roles: ['admin'] },
-    { label: 'Manage Clients',       icon: Users,           href: '/clients',              roles: ['admin'] },
+    { label: 'Manage Clients',       icon: Users,           href: '/admins/clients',              roles: ['admin', 'manager', 'receptionist'] },
     { label: 'Statistics',           icon: BarChart3,       href: '/statistics',           roles: ['admin'] },
     { label: 'Manage Rooms',         icon: Bed,             href: '/admins/rooms',         roles: ['admin', 'manager'] },
     { label: 'Make Reservation',     icon: CalendarPlus,    href: '/client/rooms',         roles: ['client'] },

@@ -35,20 +35,3 @@ Route::middleware(['auth', 'logs-out-banned-user'])->group(function () {
 });
 
 require __DIR__ . '/auth.php';
-// roles routes
-Route::middleware(['auth', 'logs-out-banned-user', 'role:admin'])->get('/admin', function () {
-    return Inertia::render('RolePage', ['role' => 'Admin']);
-});
-
-
-Route::middleware(['auth', 'logs-out-banned-user', 'role:manager'])->get('/manager', function () {
-    return Inertia::render('RolePage', ['role' => 'Manager']);
-});
-
-Route::middleware(['auth', 'logs-out-banned-user', 'role:receptionist'])->get('/receptionist', function () {
-    return Inertia::render('RolePage', ['role' => 'Receptionist']);
-});
-
-Route::middleware(['auth', 'logs-out-banned-user', 'role:client'])->get('/client', function () {
-    return Inertia::render('RolePage', ['role' => 'Client']);
-})->name('client.home');

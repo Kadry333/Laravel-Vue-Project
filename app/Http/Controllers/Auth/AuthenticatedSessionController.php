@@ -36,14 +36,14 @@ class AuthenticatedSessionController extends Controller
         $user = Auth::user();
 
         // Role-based redirection logic (Direct redirect, bypass intended memory)
-        if ($user->hasRole('admin')) {
-            return redirect('/admins');
+       if ($user->hasRole('admin')) {
+            return redirect('/admins/dashboard');
         } elseif ($user->hasRole('manager')) {
-            return redirect('/manager');
+            return redirect('/admins/dashboard');
         } elseif ($user->hasRole('receptionist')) {
-            return redirect('/receptionist');
+            return redirect('/admins/clients');
         } elseif ($user->hasRole('client')) {
-            return redirect()->route('dashboard');
+            return redirect('/client/rooms');
         }
 
         return redirect('/');
