@@ -17,15 +17,33 @@ import {
 } from 'lucide-vue-next'
 import AdminNavItem from './AdminNavItem.vue'
 
-const navItems = [
-    { label: 'Dashboard', icon: LayoutDashboard, href: '/admins' },
+const isAdmin = computed(() => user.value.roles.some(role => role.name === 'admin'));
+const isManager = computed(() => user.value.roles.some(role => role.name === 'manager'));
+const isReceptionist = computed(() => user.value.roles.some(role => role.name === 'receptionist'));
+
+const navItems = computed(() => isAdmin.value ? [
+    { label: 'Dashboard', icon: LayoutDashboard, href: '/admins/dashboard' },
     { label: 'Manage Managers', icon: UserCog, href: '/admins/managers' },
     { label: 'Manage Receptionists', icon: UserCheck, href: '/admins/receptionists' },
     { label: 'Manage Clients', icon: Users, href: '/admins/clients' },
-    { label: 'Statistics', icon: BarChart3, href: '/admins/statistics' },
     { label: 'Manage Rooms', icon: Bed, href: '/admins/rooms' },
+    { label: 'Manage Floors', icon: Layers, href: '/admins/floors' },
     { label: 'Manage Reservations', icon: Calendar, href: '/admins/reservations' },
-]
+] : isManager.value ? [
+    { label: 'Dashboard', icon: LayoutDashboard, href: '/admins/dashboard' },
+    { label: 'Manage Receptionists', icon: UserCheck, href: '/admins/receptionists' },
+    { label: 'Manage Clients', icon: Users, href: '/admins/clients' },
+    { label: 'Manage Rooms', icon: Bed, href: '/admins/rooms' },
+    { label: 'Manage Floors', icon: Layers, href: '/admins/floors' },
+    { label: 'Manage Reservations', icon: Calendar, href: '/admins/reservations' },
+] : isReceptionist.value? [
+    { label: 'Dashboard', icon: LayoutDashboard, href: '/admins/dashboard' },
+    { label: 'Manage Clients', icon: Users, href: '/admins/clients' },
+    { label: 'Approved Clients', icon: UserCheck, href: '/admins/approved-clients' },
+    { label: 'Manage Reservations', icon: Calendar, href: '/admins/reservations' },
+] : [
+
+]);
 
 const page = usePage()
 const DEFAULT_AVATAR_PATH = '/images/default.png'
@@ -62,6 +80,10 @@ const initials = computed(() => {
         .slice(0, 2)
         .toUpperCase()
 })
+
+const user = computed(() => page.props.auth.user);
+
+
 </script>
 
 <template>

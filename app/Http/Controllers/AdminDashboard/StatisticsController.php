@@ -12,6 +12,11 @@ use Illuminate\Support\Facades\DB;
 class StatisticsController extends Controller
 {
     public function index(Request $request) {
+
+        $user = auth()->user();
+        $isReceptionist = $user->hasRole('receptionist');
+
+
         $defaultYear = Carbon::now()->year;
 
         $genderYear = $request->query('gender_year', $defaultYear);
