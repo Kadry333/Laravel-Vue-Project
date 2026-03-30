@@ -12,35 +12,22 @@ const props = defineProps({
         type: String,
         required: true,
     },
-    otp: {
-        type: String,
-        default: '',
-    },
     token: {
         type: String,
-        default: '',
+        required: true,
     },
 });
 
-// Use OTP if available, otherwise fallback to token
 const form = useForm({
-    otp: props.otp || '',
-    token: props.token || '',
+    token: props.token,
     email: props.email,
     password: '',
     password_confirmation: '',
 });
 
 const submit = () => {
-    // Use OTP reset route if OTP is present, otherwise use standard reset
-    const routeName = props.otp ? 'otp.reset' : 'password.store';
-    
-    form.post(route(routeName), {
+    form.post(route('password.store'), {
         onFinish: () => form.reset('password', 'password_confirmation'),
-        onSuccess: () => {
-            // Redirect to login page after successful reset
-            window.location.href = route('login');
-        },
     });
 };
 </script>
