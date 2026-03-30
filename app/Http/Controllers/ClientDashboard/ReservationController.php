@@ -68,7 +68,7 @@ class ReservationController extends Controller
         return Inertia::location($session->url);
     }
 
-    public function success(SuccessReservationRequest $request)
+    public function success(Request $request)
     {
         $reservation = $this->reservationRepository->first([
             'payment_session_id' => $request->session_id,
