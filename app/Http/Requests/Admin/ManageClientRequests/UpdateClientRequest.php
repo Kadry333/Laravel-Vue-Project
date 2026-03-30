@@ -28,7 +28,7 @@ class UpdateClientRequest extends FormRequest
             'email' =>  'required|email|unique:users,email,' . $clientId,
             'country_id'   => 'required|integer|exists:lc_countries,id',
             'gender' => 'required|in:male,female',
-            'mobile' => 'required|string|unique:users,mobile,' . $clientId,
+            'mobile' => 'regex:/^\+?[0-9]{10,15}$/|unique:users,mobile,' . $clientId,
             'avatar_image' => 'nullable|image|mimes:jpg,jpeg',
         ];
     }

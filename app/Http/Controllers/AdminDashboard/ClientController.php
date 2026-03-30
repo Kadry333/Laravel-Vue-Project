@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\AdminDashboard;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\ManageClientRequests\StoreClientRequest;
+use App\Http\Requests\StoreClientRequest;
 use App\Http\Requests\Admin\ManageClientRequests\UpdateClientRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -81,6 +81,7 @@ class ClientController extends Controller
         if (auth()->user()->hasRole('receptionist')) {
             abort(403);
         }
+        
 
         $user = auth()->user();
         $data = $request->validated();
@@ -171,8 +172,9 @@ class ClientController extends Controller
             'is_approved' => true,
             'approved_by' => auth()->id(),
         ]);
+        $client->notify(new \App\Notifications\ClientApprovedNotification());
 
-        return back()->with('success', 'Client approved successfully.');
+        return back()->with('success', 'Client approved successfully, Email has been sent to client.');
     }
 
     public function approvedClients(Request $request)

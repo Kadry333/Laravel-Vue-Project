@@ -23,7 +23,7 @@ const form = useForm({
 const previewUrl = ref(null);
 const currentAvatar =
     props.client.avatar_image
-        ? "/avatars/" + props.client.avatar_image
+        ? "/storage/avatars/" + props.client.avatar_image
         : '/images/default.png';
 
 function handleFile(e) {

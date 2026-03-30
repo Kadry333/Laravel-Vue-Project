@@ -225,7 +225,7 @@ function goToPage(url) {
                             <div class="flex items-center gap-3">
                                 <img
                                     :src="row.original.avatar_image && row.original.avatar_image !== 'default.png'
-                                        ? '/avatars/' + row.original.avatar_image
+                                        ? '/storage/avatars/' + row.original.avatar_image
                                         : '/images/default.png'"
                                     class="w-9 h-9 rounded-full object-cover border border-slate-200 flex-shrink-0"
                                 />
