@@ -4,21 +4,43 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Hotel, KeyRound, ArrowLeft } from 'lucide-vue-next';
+import { Hotel, KeyRound, ArrowLeft, Lock, CheckCircle2 } from 'lucide-vue-next';
 import InputError from '@/Components/InputError.vue';
 
-defineProps({
+const props = defineProps({
     status: {
         type: String,
     },
+    otpSent: {
+        type: Boolean,
+        default: false,
+    },
+    email: {
+        type: String,
+        default: '',
+    },
 });
 
-const form = useForm({
-    email: '',
+const emailForm = useForm({
+    email: props.email || '',
 });
 
-const submit = () => {
-    form.post(route('password.email'));
+const otpForm = useForm({
+    email: props.email || '',
+    otp: '',
+});
+
+const sendOtp = () => {
+    emailForm.post(route('password.email'));
+};
+
+const goToReset = () => {
+    // Use emailForm.email which is what the user typed
+    const email = emailForm.email;
+    const otp = otpForm.otp;
+    console.log('Navigating with email:', email, 'OTP:', otp);
+    const url = `/reset-password-otp/${otp}?email=${encodeURIComponent(email)}`;
+    window.location.href = url;
 };
 </script>
 
@@ -36,42 +58,87 @@ const submit = () => {
 
         <Card class="w-full max-w-md border-none shadow-xl shadow-indigo-100/50 overflow-hidden">
             <div class="h-2 bg-indigo-600 w-full"></div>
-            <CardHeader class="space-y-1 pb-6 pt-8 text-center px-6 sm:px-10">
-                <CardTitle class="text-2xl font-bold tracking-tight text-slate-900">Forgot Password?</CardTitle>
-                <CardDescription class="text-slate-500 text-sm">
-                    No problem. Enter your email and we'll send you a password reset link to get you back on track.
-                </CardDescription>
-            </CardHeader>
+            
+            <!-- STEP 1: Enter Email -->
+            <template v-if="!otpSent">
+                <CardHeader class="space-y-1 pb-6 pt-8 text-center px-6 sm:px-10">
+                    <CardTitle class="text-2xl font-bold tracking-tight text-slate-900">Forgot Password?</CardTitle>
+                    <CardDescription class="text-slate-500 text-sm">
+                        Enter your email and we'll send you a verification code to reset your password.
+                    </CardDescription>
+                </CardHeader>
 
-            <CardContent class="px-6 sm:px-10 pb-8">
-                <div v-if="status" class="mb-6 text-sm font-medium text-green-600 bg-green-50 p-4 rounded-lg border border-green-100 flex items-center shadow-sm">
-                   <KeyRound class="mr-2 h-4 w-4" /> {{ status }}
-                </div>
+                <CardContent class="px-6 sm:px-10 pb-8">
+                    <form @submit.prevent="sendOtp" class="space-y-6">
+                        <div class="space-y-2">
+                            <Label for="email" class="text-sm font-medium text-slate-700">Email Address</Label>
+                            <Input
+                                id="email"
+                                v-model="emailForm.email"
+                                type="email"
+                                placeholder="name@example.com"
+                                required
+                                autofocus
+                                class="h-11 border-slate-200 focus:ring-indigo-600 focus:border-indigo-600"
+                            />
+                            <InputError :message="emailForm.errors.email" />
+                        </div>
 
-                <form @submit.prevent="submit" class="space-y-6">
-                    <div class="space-y-2">
-                        <Label for="email" class="text-sm font-medium text-slate-700">Email Address</Label>
-                        <Input
-                            id="email"
-                            v-model="form.email"
-                            type="email"
-                            placeholder="name@example.com"
-                            required
-                            autofocus
-                            class="h-11 border-slate-200 focus:ring-indigo-600 focus:border-indigo-600"
-                        />
-                        <InputError :message="form.errors.email" />
-                    </div>
+                        <Button 
+                            class="w-full h-11 text-base font-semibold bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-100 transform transition-all active:scale-[0.98]" 
+                            :disabled="emailForm.processing"
+                        >
+                            <span v-if="emailForm.processing">Sending code...</span>
+                            <span v-else class="flex items-center">
+                                <KeyRound class="mr-2 h-4 w-4" /> Send OTP Code
+                            </span>
+                        </Button>
+                    </form>
+                </CardContent>
+            </template>
 
-                    <Button 
-                        class="w-full h-11 text-base font-semibold bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-100 transform transition-all active:scale-[0.98]" 
-                        :disabled="form.processing"
-                    >
-                        <span v-if="form.processing">Sending link...</span>
-                        <span v-else>Send Reset Link</span>
-                    </Button>
-                </form>
-            </CardContent>
+            <!-- STEP 2: Enter OTP -->
+            <template v-else>
+                <CardHeader class="space-y-1 pb-6 pt-8 text-center px-6 sm:px-10">
+                    <CardTitle class="text-2xl font-bold tracking-tight text-slate-900">Enter OTP Code</CardTitle>
+                    <CardDescription class="text-slate-500 text-sm">
+                        <span v-if="status" class="text-green-600 font-medium">{{ status }}</span>
+                        <span v-else>Enter the 6-digit code sent to your email.</span>
+                    </CardDescription>
+                </CardHeader>
+
+                <CardContent class="px-6 sm:px-10 pb-8">
+                    <form @submit.prevent="goToReset" class="space-y-6">
+                        <div class="space-y-2">
+                            <Label for="otp" class="text-sm font-medium text-slate-700">OTP Code</Label>
+                            <Input
+                                id="otp"
+                                v-model="otpForm.otp"
+                                type="text"
+                                maxlength="6"
+                                placeholder="123456"
+                                required
+                                autofocus
+                                class="h-11 border-slate-200 focus:ring-indigo-600 focus:border-indigo-600 text-center text-lg tracking-[0.5em] font-mono"
+                            />
+                            <InputError :message="otpForm.errors.otp" />
+                            <p class="text-xs text-slate-400 mt-1">
+                                <strong>Test Mode:</strong> Use OTP <code class="bg-slate-100 px-1 rounded">123456</code>
+                            </p>
+                        </div>
+
+                        <Button 
+                            class="w-full h-11 text-base font-semibold bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-100 transform transition-all active:scale-[0.98]" 
+                            :disabled="otpForm.processing || otpForm.otp.length !== 6"
+                        >
+                            <span v-if="otpForm.processing">Navigating...</span>
+                            <span v-else class="flex items-center">
+                                <CheckCircle2 class="mr-2 h-4 w-4" /> Continue to Reset
+                            </span>
+                        </Button>
+                    </form>
+                </CardContent>
+            </template>
 
             <CardFooter class="flex justify-center bg-slate-50/50 border-t border-slate-100 py-6">
                 <Link

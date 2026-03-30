@@ -11,7 +11,7 @@ const props = defineProps({
 
 <template>
     <div v-for="client in clients" :key="client.id">
-        {{ client.id }} {{ client.gender }} {{ client.country.official_name }}
+        {{ client.id }} {{ client?.gender }} {{ client.country?.official_name }}
     </div>
     <div>=======================================================================</div>
     <div v-for="receptionist in receptionists" :key="receptionist.id">

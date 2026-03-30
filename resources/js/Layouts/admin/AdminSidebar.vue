@@ -59,6 +59,7 @@ const allNavItems = [
     { label: 'Manage Floors',        icon: Building2,       href: '/admins/floors',               roles: ['admin', 'manager'] },
     { label: 'Manage Rooms',         icon: Bed,             href: '/admins/rooms',                roles: ['admin', 'manager'] },
     { label: 'Make Reservation',     icon: CalendarPlus,    href: '/client/rooms',                roles: ['client'] },
+    { label: 'My Reservations',      icon: ClipboardList,   href: '/client/reservation',                 roles: ['client'] },
 ]
 
 
