@@ -41,7 +41,7 @@ defineProps({
                     <!-- Check auth user via inertia global props if available -->
                     <Link
                         v-if="$page.props.auth?.user"
-                        :href="route('dashboard')"
+                        :href="route('rooms.index')"
                         class="text-sm font-medium hover:text-indigo-600 transition-colors"
                     >
                         Dashboard
