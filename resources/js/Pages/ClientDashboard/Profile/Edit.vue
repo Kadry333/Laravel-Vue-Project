@@ -7,6 +7,7 @@ import {
     ChevronsUpDown,
     Mail,
     MapPin,
+    Smartphone,
     UserRound,
 } from "lucide-vue-next";
 import { cn } from "@/lib/utils";
@@ -58,6 +59,7 @@ const imageLoadFailed = ref(false);
 const form = useForm({
     name: props.user?.name ?? "",
     email: props.user?.email ?? "",
+    mobile: props.user?.mobile ?? "",
     country_id: props.user?.country_id ?? null,
     gender: props.user?.gender ?? "",
     avatar_image: null,
@@ -293,6 +295,30 @@ const submit = () => {
                                 class="text-sm text-red-500"
                             >
                                 {{ form.errors.email }}
+                            </p>
+                        </div>
+
+                        <div class="space-y-2 md:col-span-2">
+                            <Label for="mobile" class="text-[#0c1a2e]"
+                                >Mobile</Label
+                            >
+                            <div class="relative">
+                                <Smartphone
+                                    class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5b708b]"
+                                />
+                                <Input
+                                    id="mobile"
+                                    v-model="form.mobile"
+                                    type="tel"
+                                    placeholder="+1234567890"
+                                    class="h-11 border-[#d9e2ec] bg-white pl-10 text-[#0c1a2e] placeholder:text-[#8aa0b8] focus-visible:ring-[#0c1a2e]"
+                                />
+                            </div>
+                            <p
+                                v-if="form.errors.mobile"
+                                class="text-sm text-red-500"
+                            >
+                                {{ form.errors.mobile }}
                             </p>
                         </div>
 

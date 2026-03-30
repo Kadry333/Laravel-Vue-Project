@@ -22,6 +22,12 @@ class UpdateProfileRequest extends FormRequest
                 'max:255',
                 Rule::unique('users', 'email')->ignore($this->user()?->id),
             ],
+            'mobile' => [
+                'required',
+                'string',
+                'regex:/^[+]?[0-9]{10,15}$/',
+                Rule::unique('users', 'mobile')->ignore($this->user()?->id),
+            ],
             'country_id' => ['nullable', 'integer', 'exists:lc_countries,id'],
             'gender' => ['nullable', 'in:male,female'],
             'avatar_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
