@@ -64,9 +64,18 @@ class FloorController extends Controller
 
     public function store(StoreFloorRequest $request)
     {
+        $user = auth()->user();
+
         try {
             $data = $request->validated();
             $floor = Floor::create($data);
+
+            abort_if(
+                $user->getRoleNames()->contains('manager') &&
+                $data['manager_id'] != $user->id,
+                403,
+                'Unauthorized action.'
+            );
 
             return redirect()->route('admins.floors.index')
                 ->with('success', 'Floor created successfully.');
@@ -78,6 +87,11 @@ class FloorController extends Controller
 
     public function edit($id)
     {
+        $user = auth()->user();
+        $isManager = $user->getRoleNames()->contains('manager');
+        if ($isManager && !Floor::where('manager_id', $user->id)->where('id', $id)->exists()) {
+            abort(403, 'You are not authorized to this floor.');
+        }
         $floor = Floor::findOrFail($id);
         $managers = User::role('manager')->get();
         return Inertia::render('AdminDashboard/Floors/Edit', [
@@ -88,6 +102,12 @@ class FloorController extends Controller
 
     public function update(UpdateFloorRequest $request, $id)
     {
+        $user = auth()->user();
+        $isManager = $user->getRoleNames()->contains('manager');
+        if ($isManager && !Floor::where('manager_id', $user->id)->where('id', $id)->exists()) {
+            abort(403, 'You are not authorized to this floor.');
+        }
+
         $floor = Floor::findOrFail($id);
         $data = $request->validated();
 
@@ -99,6 +119,13 @@ class FloorController extends Controller
 
     public function show($id)
     {
+        $user = auth()->user();
+        $isManager = $user->getRoleNames()->contains('manager');
+        if ($isManager && !Floor::where('manager_id', $user->id)->where('id', $id)->exists()) {
+            abort(403, 'You are not authorized to this floor.');
+        }
+
+
         $floor = Floor::with('manager')->findOrFail($id);
         return Inertia::render('AdminDashboard/Floors/Show', [
             'floor' => $floor,
@@ -108,6 +135,13 @@ class FloorController extends Controller
     public function destroy($id)
     {
         try {
+
+        $user = auth()->user();
+        $isManager = $user->getRoleNames()->contains('manager');
+        if ($isManager && !Floor::where('manager_id', $user->id)->where('id', $id)->exists()) {
+            abort(403, 'You are not authorized to this floor.');
+        }
+
             $floor = Floor::findOrFail($id);
 
             if ($floor->rooms()->exists()) {
