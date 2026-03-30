@@ -52,7 +52,7 @@ Route::middleware(['auth', 'logs-out-banned-user', 'role:admin|manager'])->group
         Route::get('/create', [RoomController::class , 'create'])->name('create');
         Route::post('/', [RoomController::class , 'store'])->name('store');
         Route::get('/{room}/edit', [RoomController::class , 'edit'])->name('edit');
-        Route::post('/{room}', [RoomController::class , 'update'])->name('update');
+        Route::put('/{room}', [RoomController::class , 'update'])->name('update');
         Route::delete('/{room}', [RoomController::class , 'destroy'])->name('destroy');
     });
 });

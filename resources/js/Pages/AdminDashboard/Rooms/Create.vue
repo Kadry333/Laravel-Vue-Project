@@ -1,6 +1,7 @@
 <script setup>
 import AdminLayout from '@/Layouts/AdminLayout.vue'
-import { useForm, Link } from '@inertiajs/vue3'
+import { computed } from 'vue'
+import { useForm, Link, usePage } from '@inertiajs/vue3'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -12,28 +13,31 @@ import {
 defineOptions({ layout: AdminLayout })
 
 const props = defineProps({
-    floors: Array,
+    floors:   Array,
+    managers: Array,
 })
 
+const page    = usePage()
+const isAdmin = computed(() => page.props.auth.primary_role === 'admin')
+
 const form = useForm({
-    number:   '',
-    capacity: '',
-    price:    '',
-    floor_id: '',
+    number:     '',
+    capacity:   '',
+    price:      '',
+    floor_id:   '',
+    manager_id: '',
 })
 
 function submit() {
-    form.transform(data => ({
-        ...data,
-        price: data.price ,
-    })).post('/admins/rooms', {
-        onSuccess: () => form.reset()
+    form.post('/admins/rooms', {
+        onSuccess: () => form.reset(),
     })
 }
 </script>
 
 <template>
     <div class="w-full">
+        <!-- Header -->
         <div class="mb-6 flex items-center justify-between">
             <div>
                 <h1 class="text-2xl font-bold text-slate-900">Add New Room</h1>
@@ -48,22 +52,18 @@ function submit() {
 
             <div class="space-y-2">
                 <Label>Room Number</Label>
-                <Input v-model="form.number" placeholder="e.g. 101" required />
+                <Input v-model="form.number" placeholder="e.g. 101" />
                 <p v-if="form.errors.number" class="text-xs text-red-500">{{ form.errors.number }}</p>
             </div>
 
             <div class="space-y-2">
                 <Label>Floor</Label>
-                <Select v-model="form.floor_id" required>
+                <Select v-model="form.floor_id">
                     <SelectTrigger class="w-full">
                         <SelectValue placeholder="Select a floor" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem
-                            v-for="floor in floors"
-                            :key="floor.id"
-                            :value="String(floor.id)"
-                        >
+                        <SelectItem v-for="floor in floors" :key="floor.id" :value="String(floor.id)">
                             {{ floor.name }}
                         </SelectItem>
                     </SelectContent>
@@ -73,14 +73,30 @@ function submit() {
 
             <div class="space-y-2">
                 <Label>Capacity</Label>
-                <Input v-model="form.capacity" type="number" min="1" placeholder="e.g. 2" required />
+                <Input v-model="form.capacity" type="number" min="1" placeholder="e.g. 2" />
                 <p v-if="form.errors.capacity" class="text-xs text-red-500">{{ form.errors.capacity }}</p>
             </div>
 
             <div class="space-y-2">
                 <Label>Price per night ($)</Label>
-                <Input v-model="form.price" type="number" min="1" placeholder="e.g. 120" required />
+                <Input v-model="form.price" type="number" min="1" placeholder="e.g. 120" />
                 <p v-if="form.errors.price" class="text-xs text-red-500">{{ form.errors.price }}</p>
+            </div>
+
+            <!-- Manager select: Admin only -->
+            <div v-if="isAdmin" class="space-y-2">
+                <Label>Manager</Label>
+                <Select v-model="form.manager_id">
+                    <SelectTrigger class="w-full">
+                        <SelectValue placeholder="Select a manager" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem v-for="manager in managers" :key="manager.id" :value="String(manager.id)">
+                            {{ manager.name }}
+                        </SelectItem>
+                    </SelectContent>
+                </Select>
+                <p v-if="form.errors.manager_id" class="text-xs text-red-500">{{ form.errors.manager_id }}</p>
             </div>
 
             <div class="flex gap-2 justify-end pt-2">
