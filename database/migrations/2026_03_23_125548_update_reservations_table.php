@@ -19,7 +19,8 @@ return new class extends Migration
                     'status',
                     [
                         ReservationStatus::PENDING,
-                        ReservationStatus::APPROVED
+                        ReservationStatus::APPROVED,
+                        ReservationStatus::CANCELLED,
                     ]
                 )->default(ReservationStatus::PENDING)->after('paid_price');
             }

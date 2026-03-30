@@ -8,10 +8,9 @@ use App\Cores\General\RepositoryInterfaces\RoomRepositoryInterface;
 use App\Cores\General\Service\Contract\StripePaymentContract;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateReservationRequest;
-use App\Http\Requests\SuccessReservationRequest;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use Stripe\Stripe;
 use Stripe\Webhook;
 use Stripe\Exception\SignatureVerificationException;
@@ -34,10 +33,10 @@ class ReservationController extends Controller
 
     public function index()
     {
-        $reservations = $this->reservationRepository->paginate(10, ['room'], ['client_id' => \Illuminate\Support\Facades\Auth::id()]);
+        $reservations = $this->reservationRepository->paginate(10, ['room'], ['client_id' => Auth::id()]);
 
         return Inertia::render('ClientDashboard/Reservations/Index', [
-            'reservations' => $reservations
+            'reservations' => $reservations,
         ]);
     }
 
@@ -82,18 +81,26 @@ class ReservationController extends Controller
         ]);
     }
 
-    public function cancel()
+    public function cancel(Request $request)
     {
+        if ($request->session_id) {
+            $reservation = $this->reservationRepository->first([
+                'payment_session_id' => $request->session_id,
+            ]);
+
+            if ($reservation && $reservation->status === ReservationStatus::PENDING) {
+                $this->reservationRepository->update($reservation->id, [
+                    'status' => ReservationStatus::CANCELLED,
+                ]);
+            }
+        }
+
         return redirect()->route('client.rooms.index')
             ->with('payment_cancelled', true);
     }
 
-
-
     public function handle(Request $request)
     {
-
-        Log::info('Stripe Webhook: 1', $request->all());
         Stripe::setApiKey(config('services.stripe.secret'));
 
         try {
@@ -115,16 +122,21 @@ class ReservationController extends Controller
         if (!$reservation) {
             return response('Not found', 404);
         }
-        Log::info('Stripe Webhook: 2', $request->all());
+
         $status = match ($event->type) {
             'checkout.session.completed' => ReservationStatus::APPROVED,
-            default                      => ReservationStatus::PENDING,
+            'checkout.session.expired'   => ReservationStatus::CANCELLED,
+            default                      => null,
         };
 
-        if ($status) {
-            $this->reservationRepository->update($reservation->id, ['status' => $status]);
+        if ($status === ReservationStatus::APPROVED && $reservation->status !== ReservationStatus::CANCELLED) {
+            $this->reservationRepository->update($reservation->id, ['status' => ReservationStatus::APPROVED]);
         }
-        Log::info('Stripe Webhook: 3', $request->all());
+
+        if ($status === ReservationStatus::CANCELLED && $reservation->status !== ReservationStatus::APPROVED) {
+            $this->reservationRepository->update($reservation->id, ['status' => ReservationStatus::CANCELLED]);
+        }
+
         return response('OK', 200);
     }
 }
