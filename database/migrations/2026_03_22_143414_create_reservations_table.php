@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignId('receptionist_id')->constrained('users')->cascadeOnDelete();
             $table->integer('accompany_number');
             $table->bigInteger('paid_price')->unsigned();
-            $table->enum('status', ['pending', 'approved'])->default('pending');
+
             $table->date('check_in_date');
             $table->date('check_out_date');
             $table->timestamps();

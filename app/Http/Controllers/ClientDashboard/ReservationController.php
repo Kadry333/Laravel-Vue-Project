@@ -88,7 +88,7 @@ class ReservationController extends Controller
                 'payment_session_id' => $request->session_id,
             ]);
 
-            if ($reservation && $reservation->status === ReservationStatus::PENDING) {
+            if ($reservation && $reservation->status === ReservationStatus::PENDING->value) {
                 $this->reservationRepository->update($reservation->id, [
                     'status' => ReservationStatus::CANCELLED,
                 ]);
