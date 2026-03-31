@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Stripe\Stripe;
 use Stripe\Webhook;
 use Stripe\Exception\SignatureVerificationException;
+use Illuminate\Support\Facades\DB;
 
 class ReservationController extends Controller
 {
@@ -40,31 +41,42 @@ class ReservationController extends Controller
         ]);
     }
 
+
     public function create(CreateReservationRequest $request)
     {
-        $room = $this->roomRepository->find($request->room_id);
+        try {
+            return DB::transaction(function () use ($request) {
 
-        $nights = \Carbon\Carbon::parse($request->check_in_date)
-            ->diffInDays(\Carbon\Carbon::parse($request->check_out_date));
+                $room = $this->roomRepository->find($request->room_id);
 
-        $reservation = $this->reservationRepository->store([
-            'client_id'        => auth()->id(),
-            'room_id'          => $request->room_id,
-            'accompany_number' => $request->accompany_number,
-            'paid_price'       => $room->price * $nights,
-            'status'           => ReservationStatus::PENDING,
-            'check_in_date'    => $request->check_in_date,
-            'check_out_date'   => $request->check_out_date,
-        ]);
+                $nights = \Carbon\Carbon::parse($request->check_in_date)
+                    ->diffInDays(\Carbon\Carbon::parse($request->check_out_date));
 
-        $session = $this->stripePayment->createCheckoutSession(
-            $reservation->id,
-            $reservation->paid_price
-        );
+                $reservation = $this->reservationRepository->store([
+                    'client_id'        => auth()->id(),
+                    'room_id'          => $request->room_id,
+                    'accompany_number' => $request->accompany_number,
+                    'paid_price'       => $room->price * $nights,
+                    'status'           => ReservationStatus::PENDING,
+                    'check_in_date'    => $request->check_in_date,
+                    'check_out_date'   => $request->check_out_date,
+                ]);
 
-        $reservation->update(['payment_session_id' => $session->id]);
+                $session = $this->stripePayment->createCheckoutSession(
+                    $reservation->id,
+                    $reservation->paid_price
+                );
 
-        return Inertia::location($session->url);
+                $reservation->update([
+                    'payment_session_id' => $session->id
+                ]);
+
+                return Inertia::location($session->url);
+            });
+        } catch (\Exception $e) {
+          
+            return back()->with('error', 'Something went wrong, please try again.');
+        }
     }
 
     public function success(Request $request)
