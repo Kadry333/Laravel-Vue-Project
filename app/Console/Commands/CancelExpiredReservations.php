@@ -13,10 +13,12 @@ class CancelExpiredReservations extends Command
 
     public function handle()
     {
+        $minutes = (int) config('services.reservation.expiry_minutes', 30);
+
         $count = Reservation::where('status', ReservationStatus::PENDING)
-            ->where('created_at', '<', now()->subMinutes(30))
+            ->where('created_at', '<', now()->subMinutes($minutes))
             ->update(['status' => ReservationStatus::CANCELLED]);
 
-        $this->info("Cancelled {$count} expired reservations.");
+        $this->info("Cancelled {$count} expired reservations (threshold: {$minutes} min).");
     }
 }

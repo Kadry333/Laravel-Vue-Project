@@ -49,7 +49,9 @@ class CreateReservationRequest extends FormRequest
 
                     $pending = \App\Models\Reservation::where('room_id', $value)
                         ->where('status', ReservationStatus::PENDING)
-                        ->where('created_at', '>=', now()->subMinutes(30))
+                        ->where('created_at', '>=', now()->subMinutes(
+                            config('services.reservation.expiry_minutes', 30)
+                        ))
                         ->where('check_in_date', '<', $this->check_out_date)
                         ->where('check_out_date', '>', $this->check_in_date)
                         ->exists();

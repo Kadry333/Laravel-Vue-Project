@@ -28,7 +28,7 @@ class StripePaymentService implements StripePaymentContract
                 'quantity' => 1,
             ]],
             'mode'        => 'payment',
-            'expires_at'  => now()->addMinutes(30)->timestamp,
+            'expires_at' => now()->addMinutes(config('services.stripe.session_minutes', 30))->timestamp,
             'success_url' => config('services.stripe.success_url') . '?session_id={CHECKOUT_SESSION_ID}',
             'cancel_url' => config('services.stripe.cancel_url') . '?session_id={CHECKOUT_SESSION_ID}',
             'metadata' => [
