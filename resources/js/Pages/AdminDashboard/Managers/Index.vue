@@ -92,7 +92,7 @@ const table = useVueTable({
     columns: [
         {
             accessorKey: "name",
-            header: () => "Name",
+            header: () => "Manager",
         },
         {
             accessorKey: "email",
@@ -101,10 +101,6 @@ const table = useVueTable({
         {
             accessorKey: "national_id",
             header: () => "National ID",
-        },
-        {
-            accessorKey: "avatar_image",
-            header: () => "Image",
         },
     ],
     getCoreRowModel: getCoreRowModel(),
@@ -153,7 +149,10 @@ const table = useVueTable({
                                 @click="changeSort('name')"
                                 class="cursor-pointer px-5 py-3"
                             >
-                                Name
+                                Manager
+                                <span v-if="sorting === 'name'">
+                                    {{ direction === "asc" ? "↑" : "↓" }}
+                                </span>
                             </th>
 
                             <th
@@ -161,6 +160,9 @@ const table = useVueTable({
                                 class="cursor-pointer px-5 py-3"
                             >
                                 Email
+                                <span v-if="sorting === 'email'">
+                                    {{ direction === "asc" ? "↑" : "↓" }}
+                                </span>
                             </th>
 
                             <th
@@ -168,9 +170,11 @@ const table = useVueTable({
                                 class="cursor-pointer px-5 py-3"
                             >
                                 National ID
-                            </th>
 
-                            <th class="cursor-pointer px-5 py-3">Image</th>
+                                <span v-if="sorting === 'national_id'">
+                                    {{ direction === "asc" ? "↑" : "↓" }}
+                                </span>
+                            </th>
 
                             <th class="px-5 py-3">Actions</th>
                         </tr>
@@ -182,34 +186,33 @@ const table = useVueTable({
                             :key="manager.id"
                             class="border-b hover:bg-slate-50"
                         >
-                            <td class="px-5 py-4">
+                            <td class="px-5 py-3">
                                 <div class="flex items-center gap-1.5">
+                                    <img
+                                        :src="
+                                            manager.avatar_image
+                                                ? `/storage/${manager.avatar_image}`
+                                                : '/images/default.png'
+                                        "
+                                        class="w-10 h-10 mr-2 rounded-full object-cover border"
+                                        alt="Manager Avatar"
+                                    />
+
                                     {{ manager.name }}
                                 </div>
                             </td>
 
-                            <td class="px-5 py-4">
+                            <td class="px-5 py-3">
                                 <div class="flex items-center gap-1.5">
                                     {{ manager.email }}
                                 </div>
                             </td>
 
-                            <td class="px-5 py-4 font-semibold">
+                            <td class="px-5 py-3 font-semibold">
                                 {{ manager.national_id }}
                             </td>
 
-                            <td class="px-5 py-4">
-                                <img
-                                    :src="
-                                        manager.avatar_image
-                                            ? `/storage/${manager.avatar_image}`
-                                            : '/images/default.png'
-                                    "
-                                    class="w-10 h-10 rounded-full object-cover border"
-                                    alt="Manager Avatar"
-                                />
-                            </td>
-                            <td class="px-5 py-4">
+                            <td class="px-5 py-3">
                                 <div class="flex gap-2">
                                     <Link
                                         :href="`/admins/managers/${manager.id}`"
@@ -252,6 +255,7 @@ const table = useVueTable({
 
             <div class="flex justify-between mt-4">
                 <Button
+                    variant="outline"
                     :disabled="!props.managers.prev_page_url || form.processing"
                     @click="
                         fetchData({ page: props.managers.current_page - 1 })
@@ -260,12 +264,13 @@ const table = useVueTable({
                     Prev
                 </Button>
 
-                <span>
+                <span class="text-sm text-slate-600 font-medium self-center">
                     Page {{ props.managers.current_page }} of
                     {{ props.managers.last_page }}
                 </span>
 
                 <Button
+                    variant="outline"
                     :disabled="!props.managers.next_page_url || form.processing"
                     @click="
                         fetchData({ page: props.managers.current_page + 1 })

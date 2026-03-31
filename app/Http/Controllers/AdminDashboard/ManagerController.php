@@ -27,7 +27,7 @@ class ManagerController extends Controller
                 $direction = $filters['direction'] ?? 'asc';
                 $query->orderBy($sort, $direction);
             })
-            ->paginate(5)
+            ->paginate(10)
             ->withQueryString();
 
         return Inertia::render('AdminDashboard/Managers/Index', [

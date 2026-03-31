@@ -38,7 +38,7 @@ class RoomController extends Controller
         $filters = request()->only(['search', 'sort', 'direction']);
 
         return Inertia::render('AdminDashboard/Rooms/Index', [
-            'rooms'   => $this->roomRepository->paginate(5, ['floor', 'manager'], [], $filters),
+            'rooms'   => $this->roomRepository->paginate(10, ['floor', 'manager'], [], $filters),
             'filters' => $filters,
         ]);
     }

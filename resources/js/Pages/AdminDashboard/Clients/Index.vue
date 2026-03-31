@@ -9,6 +9,13 @@ import AlertDialogHeader from "@/components/ui/alert-dialog/AlertDialogHeader.vu
 import AlertDialogTitle from "@/components/ui/alert-dialog/AlertDialogTitle.vue";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import { Link, router } from "@inertiajs/vue3";
 import { getCoreRowModel, useVueTable } from "@tanstack/vue-table";
@@ -72,7 +79,7 @@ function countryName(id) {
 }
 
 function exportExcel() {
-    window.location.href = route('admins.clients.export');
+    window.location.href = route("admins.clients.export");
 }
 
 const columns = computed(() => {
@@ -185,15 +192,9 @@ function goToPage(url) {
                     ← Pending Clients
                 </Button>
 
-            <Button
-    v-if="canCreate"
-    variant="outline"
-    @click="exportExcel"
->
-    Export Excel
-</Button>
-
-                
+                <Button v-if="canCreate" variant="outline" @click="exportExcel">
+                    Export Excel
+                </Button>
 
                 <!-- Add Client — admin + manager only -->
                 <Link v-if="canCreate" :href="route('admins.clients.create')">
@@ -205,219 +206,267 @@ function goToPage(url) {
             </div>
         </div>
 
-        <!-- Search + filters row -->
-        <div class="flex flex-wrap gap-3 mb-4">
-            <Input
-                v-model="search"
-                placeholder="Search by name or email..."
-                class="w-64 bg-white"
-            />
+        <div class="flex flex-wrap items-end gap-4 mb-4">
+            <div class="flex flex-col gap-1">
+                <label class="text-xs text-slate-500">Search</label>
+                <Input
+                    v-model="search"
+                    placeholder="Search by name or email..."
+                    class="w-64 bg-white"
+                />
+            </div>
 
-            <select
-                v-model="country_id"
-                class="px-3 py-2 text-sm bg-white border border-slate-200 rounded-md focus:outline-none focus:ring-1 focus:ring-slate-400 text-slate-600"
-            >
-                <option value="">All Countries</option>
-                <option v-for="c in countries" :key="c.id" :value="c.id">
-                    {{ c.name }}
-                </option>
-            </select>
+            <div class="flex flex-col gap-1">
+                <label class="text-xs text-slate-500">Country</label>
+                <Select
+                    :model-value="country_id ?? 'all'"
+                    @update:model-value="
+                        (val) => (country_id = val === 'all' ? '' : val)
+                    "
+                >
+                    <SelectTrigger class="w-48 bg-white">
+                        <SelectValue placeholder="All Countries" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All Countries</SelectItem>
+                        <SelectItem
+                            v-for="c in countries"
+                            :key="c.id"
+                            :value="c.id"
+                        >
+                            {{ c.name }}
+                        </SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
 
-            <select
-                v-model="gender"
-                class="px-3 py-2 text-sm bg-white border border-slate-200 rounded-md focus:outline-none focus:ring-1 focus:ring-slate-400 text-slate-600"
-            >
-                <option value="">All Genders</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-            </select>
+            <div class="flex flex-col gap-1">
+                <label class="text-xs text-slate-500">Gender</label>
+                <Select
+                    :model-value="gender ?? 'all'"
+                    @update:model-value="
+                        (val) => (gender = val === 'all' ? '' : val)
+                    "
+                >
+                    <SelectTrigger class="w-40 bg-white">
+                        <SelectValue placeholder="All Genders" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All Genders</SelectItem>
+                        <SelectItem value="male">Male</SelectItem>
+                        <SelectItem value="female">Female</SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
 
-            <!-- Status filter — admin + manager only -->
-            <select
+            <div
                 v-if="!isReceptionist && !isApprovedPage"
-                v-model="status"
-                class="px-3 py-2 text-sm bg-white border border-slate-200 rounded-md focus:outline-none focus:ring-1 focus:ring-slate-400 text-slate-600"
+                class="flex flex-col gap-1"
             >
-                <option value="">All Statuses</option>
-                <option value="approved">Approved</option>
-                <option value="pending">Pending</option>
-            </select>
+                <label class="text-xs text-slate-500">Status</label>
+                <Select
+                    :model-value="status ?? 'all'"
+                    @update:model-value="
+                        (val) => (status = val === 'all' ? '' : val)
+                    "
+                >
+                    <SelectTrigger class="w-40 bg-white">
+                        <SelectValue placeholder="All Statuses" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All Statuses</SelectItem>
+                        <SelectItem value="approved">Approved</SelectItem>
+                        <SelectItem value="pending">Pending</SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
         </div>
 
-        <!-- Table -->
-        <div class="bg-white rounded-xl border shadow-sm overflow-x-auto">
-            <table class="w-full text-sm">
-                <thead>
-                    <tr class="bg-slate-50 border-b">
-                        <th
-                            v-for="header in table.getFlatHeaders()"
-                            :key="header.id"
-                            class="px-5 py-3"
-                            :class="{
-                                'cursor-pointer': header.column.id === 'name',
-                            }"
-                            @click="header.column.id === 'name' && toggleSort()"
-                        >
-                            {{ header.column.columnDef.header }}
-                            <span
-                                v-if="
-                                    header.column.id === 'name' &&
-                                    sort === 'name'
+        <div v-if="table.getRowModel().rows.length > 0">
+            <!-- Table -->
+            <div class="bg-white rounded-xl border shadow-sm overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="bg-slate-50 border-b">
+                            <th
+                                v-for="header in table.getFlatHeaders()"
+                                :key="header.id"
+                                class="px-5 py-3"
+                                :class="{
+                                    'cursor-pointer':
+                                        header.column.id === 'name',
+                                }"
+                                @click="
+                                    header.column.id === 'name' && toggleSort()
                                 "
                             >
-                                {{ direction === "asc" ? "↑" : "↓" }}
-                            </span>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-if="table.getRowModel().rows.length === 0">
-                        <td
-                            :colspan="columns.length"
-                            class="px-5 py-20 text-center text-slate-400 italic"
-                        >
-                            No clients found.
-                        </td>
-                    </tr>
-
-                    <tr
-                        v-for="row in table.getRowModel().rows"
-                        :key="row.id"
-                        class="border-b hover:bg-slate-50"
-                    >
-                        <!-- Client Details -->
-                        <td class="px-5 py-4">
-                            <div class="flex items-center gap-3">
-                                <img
-                                    :src="
-                                        row.original.avatar_image &&
-                                        row.original.avatar_image !==
-                                            'default.png'
-                                            ? '/storage/' +
-                                              row.original.avatar_image
-                                            : '/images/default.png'
-                                    "
-                                    class="w-9 h-9 rounded-full object-cover border border-slate-200 flex-shrink-0"
-                                />
-                                <div class="flex flex-col">
-                                    <span class="font-bold text-slate-900">{{
-                                        row.original.name
-                                    }}</span>
-                                    <span class="text-[11px] text-slate-500">{{
-                                        row.original.email
-                                    }}</span>
-                                </div>
-                            </div>
-                        </td>
-
-                        <!-- Mobile -->
-                        <td class="px-5 py-4 text-slate-700">
-                            {{ row.original.mobile ?? "—" }}
-                        </td>
-
-                        <!-- Country + Gender -->
-                        <td class="px-5 py-4">
-                            <div class="flex flex-col">
-                                <span class="text-slate-700 font-medium">{{
-                                    countryName(row.original.country_id)
-                                }}</span>
+                                {{ header.column.columnDef.header }}
                                 <span
-                                    class="text-[10px] text-slate-400 uppercase font-bold"
-                                    >{{ row.original.gender }}</span
-                                >
-                            </div>
-                        </td>
-
-                        <!-- Status -->
-                        <td
-                            v-if="!isReceptionist && !isApprovedPage"
-                            class="px-5 py-4"
-                        >
-                            <span
-                                :class="[
-                                    'inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold capitalize',
-                                    row.original.is_approved
-                                        ? 'bg-emerald-100 text-emerald-700'
-                                        : 'bg-amber-100 text-amber-700',
-                                ]"
-                            >
-                                {{
-                                    row.original.is_approved
-                                        ? "Approved"
-                                        : "Pending Verification"
-                                }}
-                            </span>
-                        </td>
-
-                        <!-- Actions -->
-                        <td v-if="!isApprovedPage" class="px-5 py-4">
-                            <div class="flex items-center gap-2">
-                                <!-- Approve -->
-                                <Button
-                                    v-if="!row.original.is_approved"
-                                    variant="outline"
-                                    size="sm"
-                                    class="text-emerald-600 border-emerald-200 bg-emerald-50 hover:bg-emerald-100"
-                                    @click="approveClient(row.original)"
-                                >
-                                    <CheckCircle class="w-3.5 h-3.5 mr-1.5" />
-                                    Approve
-                                </Button>
-                                <div v-else class="w-[90px]"></div>
-
-                                <!-- Edit -->
-                                <Link
-                                    v-if="canCreate"
-                                    :href="
-                                        route(
-                                            'admins.clients.edit',
-                                            row.original.id,
-                                        )
+                                    v-if="
+                                        header.column.id === 'name' &&
+                                        sort === 'name'
                                     "
                                 >
-                                    <Button variant="outline" size="icon">
-                                        <Pencil class="w-3.5 h-3.5" />
-                                    </Button>
-                                </Link>
+                                    {{ direction === "asc" ? "↑" : "↓" }}
+                                </span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr
+                            v-for="row in table.getRowModel().rows"
+                            :key="row.id"
+                            class="border-b hover:bg-slate-50"
+                        >
+                            <!-- Client Details -->
+                            <td class="px-5 py-4">
+                                <div class="flex items-center gap-3">
+                                    <img
+                                        :src="
+                                            row.original.avatar_image &&
+                                            row.original.avatar_image !==
+                                                'default.png'
+                                                ? '/storage/' +
+                                                  row.original.avatar_image
+                                                : '/images/default.png'
+                                        "
+                                        class="w-9 h-9 rounded-full object-cover border border-slate-200 flex-shrink-0"
+                                    />
+                                    <div class="flex flex-col">
+                                        <span
+                                            class="font-bold text-slate-900"
+                                            >{{ row.original.name }}</span
+                                        >
+                                        <span
+                                            class="text-[11px] text-slate-500"
+                                            >{{ row.original.email }}</span
+                                        >
+                                    </div>
+                                </div>
+                            </td>
 
-                                <!-- Delete -->
-                                <Button
-                                    v-if="canDelete"
-                                    variant="outline"
-                                    size="icon"
-                                    class="text-red-500"
-                                    @click="confirmDelete(row.original)"
+                            <!-- Mobile -->
+                            <td class="px-5 py-4 text-slate-700">
+                                {{ row.original.mobile ?? "—" }}
+                            </td>
+
+                            <!-- Country + Gender -->
+                            <td class="px-5 py-4">
+                                <div class="flex flex-col">
+                                    <span class="text-slate-700 font-medium">{{
+                                        countryName(row.original.country_id)
+                                    }}</span>
+                                    <span
+                                        class="text-[10px] text-slate-400 uppercase font-bold"
+                                        >{{ row.original.gender }}</span
+                                    >
+                                </div>
+                            </td>
+
+                            <!-- Status -->
+                            <td
+                                v-if="!isReceptionist && !isApprovedPage"
+                                class="px-5 py-4"
+                            >
+                                <span
+                                    :class="[
+                                        'inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold capitalize',
+                                        row.original.is_approved
+                                            ? 'bg-emerald-100 text-emerald-700'
+                                            : 'bg-amber-100 text-amber-700',
+                                    ]"
                                 >
-                                    <Trash2 class="w-3.5 h-3.5" />
-                                </Button>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                                    {{
+                                        row.original.is_approved
+                                            ? "Approved"
+                                            : "Pending Verification"
+                                    }}
+                                </span>
+                            </td>
+
+                            <!-- Actions -->
+                            <td v-if="!isApprovedPage" class="px-5 py-4">
+                                <div
+                                    class="flex items-center justify-start w-full gap-2"
+                                >
+                                    <!-- Edit -->
+                                    <Link
+                                        v-if="canCreate"
+                                        :href="
+                                            route(
+                                                'admins.clients.edit',
+                                                row.original.id,
+                                            )
+                                        "
+                                    >
+                                        <Button variant="outline" size="icon">
+                                            <Pencil class="w-3.5 h-3.5" />
+                                        </Button>
+                                    </Link>
+
+                                    <!-- Delete -->
+                                    <Button
+                                        v-if="canDelete"
+                                        variant="outline"
+                                        size="icon"
+                                        class="text-red-500"
+                                        @click="confirmDelete(row.original)"
+                                    >
+                                        <Trash2 class="w-3.5 h-3.5" />
+                                    </Button>
+
+                                    <!-- Approve -->
+                                    <Button
+                                        v-if="!row.original.is_approved"
+                                        variant="outline"
+                                        size="sm"
+                                        class="text-emerald-600 border-emerald-200 bg-emerald-50 hover:bg-emerald-100"
+                                        @click="approveClient(row.original)"
+                                    >
+                                        <CheckCircle
+                                            class="w-3.5 h-3.5 mr-1.5"
+                                        />
+                                        Approve
+                                    </Button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="flex justify-between mt-4">
+                <Button
+                    variant="outline"
+                    :disabled="!clients.prev_page_url"
+                    @click="goToPage(clients.prev_page_url)"
+                >
+                    Prev
+                </Button>
+
+                <span class="text-sm text-slate-600 font-medium self-center">
+                    Page {{ clients.current_page }} of {{ clients.last_page }}
+                </span>
+
+                <Button
+                    variant="outline"
+                    :disabled="!clients.next_page_url"
+                    @click="goToPage(clients.next_page_url)"
+                >
+                    Next
+                </Button>
+            </div>
         </div>
 
-        <!-- Pagination -->
-        <div class="flex justify-between mt-4">
-            <Button
-                variant="outline"
-                :disabled="!clients.prev_page_url"
-                @click="goToPage(clients.prev_page_url)"
-            >
-                Prev
-            </Button>
-
-            <span class="text-sm text-slate-600 font-medium self-center">
-                Page {{ clients.current_page }} of {{ clients.last_page }}
-            </span>
-
-            <Button
-                variant="outline"
-                :disabled="!clients.next_page_url"
-                @click="goToPage(clients.next_page_url)"
-            >
-                Next
-            </Button>
+        <div
+            v-else
+            class="flex flex-col items-center justify-center py-16 text-muted-foreground"
+        >
+            <p class="text-base font-medium">No Clients available</p>
+            <p class="text-sm">
+                Try adjusting your filters or add a new client
+            </p>
         </div>
 
         <!-- Delete AlertDialog (same as manager page) -->

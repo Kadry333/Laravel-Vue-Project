@@ -21,7 +21,7 @@ interface RoomRepositoryInterface
     public function delete(array $conditions): void;
 
     public function paginate(
-        int $perPage = 15,
+        int $perPage = 10,
         array $withRelational = [],
         array $conditions = [],
         array $filters = []

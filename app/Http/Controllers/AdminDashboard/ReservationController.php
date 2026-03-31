@@ -28,7 +28,7 @@ class ReservationController extends Controller
         ];
 
         // Fetching all reservations with relationships (client and room)
-        $reservations = $this->reservationRepository->paginate(15, ['client', 'room'], $filters);
+        $reservations = $this->reservationRepository->paginate(10, ['client', 'room'], $filters);
 
         // Stats for executive cards
         $stats = [

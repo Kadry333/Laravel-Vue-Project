@@ -43,10 +43,18 @@ class FloorController extends Controller
                 $query->where('id', '<=', $max);
             })
             ->when($filters['sort'] ?? null, function ($query, $sort) use ($filters) {
+
                 $direction = $filters['direction'] ?? 'asc';
-                $query->orderBy($sort, $direction);
+
+                if ($sort === 'manager.name') {
+                    $query->leftJoin('users as managers', 'floors.manager_id', '=', 'managers.id')
+                        ->orderBy('managers.name', $direction)
+                        ->select('floors.*');
+                } else {
+                    $query->orderBy($sort, $direction);
+                }
             })
-            ->paginate(5)
+            ->paginate(10)
             ->withQueryString();
 
         return Inertia::render('AdminDashboard/Floors/Index', [

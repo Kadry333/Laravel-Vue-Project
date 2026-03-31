@@ -191,6 +191,9 @@ const table = useVueTable({
                                 class="cursor-pointer px-5 py-3"
                             >
                                 Name
+                                <span v-if="sorting === 'name'">
+                                    {{ direction === "asc" ? "↑" : "↓" }}
+                                </span>
                             </th>
 
                             <th
@@ -198,6 +201,9 @@ const table = useVueTable({
                                 class="cursor-pointer px-5 py-3"
                             >
                                 Number
+                                <span v-if="sorting === 'id'">
+                                    {{ direction === "asc" ? "↑" : "↓" }}
+                                </span>
                             </th>
 
                             <th
@@ -206,6 +212,9 @@ const table = useVueTable({
                                 class="cursor-pointer px-5 py-3"
                             >
                                 Manager
+                                <span v-if="sorting === 'manager.name'">
+                                    {{ direction === "asc" ? "↑" : "↓" }}
+                                </span>
                             </th>
 
                             <th class="px-5 py-3">Actions</th>
@@ -218,23 +227,26 @@ const table = useVueTable({
                             :key="floor.id"
                             class="border-b hover:bg-slate-50"
                         >
-                            <td class="px-5 py-4">
+                            <td class="px-5 py-3">
                                 <div class="flex items-center gap-1.5">
                                     {{ floor.name }}
+                                    <span v-if="sorting === 'name'">
+                                        {{ direction === "asc" ? "↑" : "↓" }}
+                                    </span>
                                 </div>
                             </td>
 
-                            <td class="px-5 py-4">
+                            <td class="px-5 py-3">
                                 <div class="flex items-center gap-1.5">
                                     {{ floor.id }}
                                 </div>
                             </td>
 
-                            <td v-if="isAdmin" class="px-5 py-4 font-semibold">
+                            <td v-if="isAdmin" class="px-5 py-3 font-semibold">
                                 {{ floor.manager.name }}
                             </td>
 
-                            <td class="px-5 py-4">
+                            <td class="px-5 py-3">
                                 <div
                                     v-if="
                                         isAdmin || user.id === floor.manager.id
@@ -282,16 +294,18 @@ const table = useVueTable({
                 <Button
                     :disabled="!props.floors.prev_page_url || form.processing"
                     @click="fetchData({ page: props.floors.current_page - 1 })"
+                    variant="outline"
                 >
                     Prev
                 </Button>
 
-                <span>
+                <span class="text-sm text-slate-600 font-medium self-center">
                     Page {{ props.floors.current_page }} of
                     {{ props.floors.last_page }}
                 </span>
 
                 <Button
+                    variant="outline"
                     :disabled="!props.floors.next_page_url || form.processing"
                     @click="fetchData({ page: props.floors.current_page + 1 })"
                 >

@@ -14,7 +14,7 @@ interface FloorRepositoryInterface
     public function store(array $data): Floor;
     public function update(int $id, array $data): void;
     public function delete(array $conditions): void;
-    public function paginate(int $perPage = 15, array $withRelational = [], array $conditions = []): LengthAwarePaginator;
+    public function paginate(int $perPage = 10, array $withRelational = [], array $conditions = []): LengthAwarePaginator;
     public function exists(array $conditions): bool;
     public function count(): int;
     public function first(array $conditions = [], array $withRelational = []): ?Floor;

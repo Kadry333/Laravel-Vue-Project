@@ -41,7 +41,6 @@ class UpdateFloorRequest extends FormRequest
                 'string',
                 'min:3',
                 'max:255',
-                'regex:/^[A-Za-z]+$/',
                 Rule::unique('floors', 'name')->ignore($id),
             ],
             'manager_id' => [

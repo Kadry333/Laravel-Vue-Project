@@ -18,7 +18,7 @@ interface ReservationRepositoryInterface
 
     public function delete(array $conditions): void;
 
-    public function paginate(int $perPage = 15, array $withRelational = [], array $conditions = []): LengthAwarePaginator;
+    public function paginate(int $perPage = 10, array $withRelational = [], array $conditions = []): LengthAwarePaginator;
 
     public function exists(array $conditions): bool;
 

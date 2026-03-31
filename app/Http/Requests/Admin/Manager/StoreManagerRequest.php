@@ -33,7 +33,7 @@ class StoreManagerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255', 'regex:/^[A-Za-z]+$/'],
+            'name' => ['required', 'string', 'max:255'],
             'email' => 'required|email|unique:users,email',
             'national_id' => [
                 'required',

@@ -37,7 +37,6 @@ class StoreFloorRequest extends FormRequest
                 'unique:floors,name',
                 'min:3',
                 'max:255',
-                'regex:/^[A-Za-z]+$/'
             ],
             'manager_id' => [
                 'required',

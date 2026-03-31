@@ -215,7 +215,7 @@ defineOptions({ layout: AdminLayout });
 </script>
 
 <template>
-    <div class="p-6 space-y-6">
+    <div class="space-y-6">
         <div class="flex items-end justify-between">
             <div>
                 <h1 class="text-2xl font-bold">Dashboard Analytics</h1>
