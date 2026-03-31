@@ -103,11 +103,6 @@ const formatDate = (dateString) => {
                     Monitoring and managing guest bookings across all floors.
                 </p>
             </div>
-            <div class="flex gap-2">
-                <Button variant="outline" class="hidden md:flex">
-                    <Calendar class="mr-2 h-4 w-4" /> Export Report
-                </Button>
-            </div>
         </div>
 
         <!-- Professional Stats Cards -->
@@ -255,22 +250,23 @@ const formatDate = (dateString) => {
                         </td>
                         <td class="px-6 py-5">
                             <div class="flex items-center gap-3">
-                                <div
-                                    class="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200 overflow-hidden"
-                                >
-                                    <img
-                                        v-if="res.client?.avatar_image"
+                              <div
+    class="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200 overflow-hidden"
+>
+   <img
                                         :src="
-                                            '/storage/' +
-                                            res.client.avatar_image
+                                            res.client.avatar_image &&
+                                            res.client.avatar_image !==
+                                                'default.png'
+                                                ? '/storage/' +
+                                                  res.client.avatar_image
+                                                : '/images/default.png'
                                         "
-                                        class="h-full w-full object-cover"
+                                        class="w-9 h-9 rounded-full object-cover border border-slate-200 flex-shrink-0"
                                     />
-                                    <UserCircle
-                                        v-else
-                                        class="h-6 w-6 text-slate-400"
-                                    />
-                                </div>
+
+    <UserCircle class="h-6 w-6 text-slate-400" />
+</div>
                                 <div class="flex flex-col">
                                     <span class="font-bold text-slate-900">{{
                                         res.client?.name
