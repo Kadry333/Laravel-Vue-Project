@@ -29,7 +29,7 @@ Route::prefix('reservation')->middleware(['auth', 'role:client'])->as('reservati
     Route::post('/create', [ReservationController::class, 'create'])->name('create');
 });
 
-Route::prefix('reservation')->middleware(['auth', 'role:client'])->as('reservation.')->group(function () {
+Route::prefix('reservation')->as('reservation.')->group(function () {
     Route::get('/success', [ReservationController::class, 'success'])->name('success');
     Route::get('/cancel', [ReservationController::class, 'cancel'])->name('cancel');
 });

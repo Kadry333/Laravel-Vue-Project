@@ -72,8 +72,10 @@ class RoomController extends Controller
 
     public function edit($id)
     {
+        $room = $this->findAndAuthorizeRoom($id, ['floor']);
+
         $data = [
-            'room'   => $this->roomRepository->find($id, ['floor']),
+            'room'   => $room,
             'floors' => $this->floorRepository->get(),
         ];
 
@@ -86,6 +88,8 @@ class RoomController extends Controller
 
     public function update(UpdateRoomRequest $request, $id)
     {
+        $room = $this->findAndAuthorizeRoom($id);
+
         $data = [
             'number'   => $request->number,
             'capacity' => $request->capacity,
@@ -97,7 +101,7 @@ class RoomController extends Controller
             $data['manager_id'] = $request->manager_id;
         }
 
-        $this->roomRepository->update($id, $data);
+        $this->roomRepository->update($room->id, $data);
 
         return redirect()->route('admins.rooms.index')
             ->with('success', 'Room updated successfully.');
@@ -105,14 +109,32 @@ class RoomController extends Controller
 
     public function destroy($id)
     {
-        $room = $this->roomRepository->find($id, ['reservations']);
+        $room = $this->findAndAuthorizeRoom($id, ['reservations']);
 
         if ($room->reservations && $room->reservations->isNotEmpty()) {
             return back()->with('error', 'Cannot delete a room that is currently reserved.');
         }
 
-        $this->roomRepository->delete(['id' => $id]);
+        $this->roomRepository->delete(['id' => $room->id]);
 
         return back()->with('success', 'Room deleted successfully.');
+    }
+
+
+    private function findAndAuthorizeRoom($id, $relations = [])
+    {
+        $room = $this->roomRepository->find($id, $relations);
+
+
+        if (!$room) {
+            abort(404, 'Room not found');
+        }
+
+
+        if (!$this->isAdmin() && $room->manager_id !== auth()->id()) {
+            abort(403, 'Unauthorized');
+        }
+
+        return $room;
     }
 }

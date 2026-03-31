@@ -46,9 +46,6 @@ return Application::configure(basePath: dirname(__DIR__))
             HandleInertiaRequests::class,
         ]);
 
-        $middleware->validateCsrfTokens(except: [
-            'client/reservation/stripe/webhook',
-        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
