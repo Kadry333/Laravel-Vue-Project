@@ -52,7 +52,15 @@ class ClientController extends Controller
             $query->where('gender', $request->gender);
         }
 
-           $clients   = $query->latest()->paginate(10)->withQueryString();
+        if ($request->filled('sort') && $request->sort === 'name') {
+            $direction = $request->get('direction', 'asc') === 'desc' ? 'desc' : 'asc';
+            $query->orderBy('name', $direction);
+        } else {
+            $query->latest();
+        }
+
+        $clients = $query->paginate(10)->withQueryString();
+
         $countries = $this->getCountries();
 
         return Inertia::render('AdminDashboard/Clients/Index', [
@@ -81,7 +89,7 @@ class ClientController extends Controller
         if (auth()->user()->hasRole('receptionist')) {
             abort(403);
         }
-        
+
 
         $user = auth()->user();
         $data = $request->validated();
@@ -93,7 +101,7 @@ class ClientController extends Controller
 
             $file->storeAs('avatars', $filename, 'public');
 
-            $data['avatar_image'] = $filename; 
+            $data['avatar_image'] = $filename;
         }
 
         $data['password']    = Hash::make($data['password']);
@@ -128,14 +136,14 @@ class ClientController extends Controller
 
         $data = $request->validated();
 
-         if ($request->hasFile('avatar_image')) {
+        if ($request->hasFile('avatar_image')) {
             $file = $request->file('avatar_image');
 
             $filename = time() . '_' . $file->getClientOriginalName();
 
             $file->storeAs('avatars', $filename, 'public');
 
-            $data['avatar_image'] = $filename; 
+            $data['avatar_image'] = $filename;
         } else {
             unset($data['avatar_image']);
         }
@@ -200,7 +208,7 @@ class ClientController extends Controller
             $query->where('gender', $request->gender);
         }
 
-                $clients   = $query->latest()->paginate(10)->withQueryString();
+        $clients   = $query->latest()->paginate(10)->withQueryString();
 
         $countries = $this->getCountries();
 
