@@ -30,7 +30,7 @@ class StripePaymentService implements StripePaymentContract
             'mode'        => 'payment',
             'expires_at'  => now()->addMinutes(30)->timestamp,
             'success_url' => config('services.stripe.success_url') . '?session_id={CHECKOUT_SESSION_ID}',
-            'cancel_url' => config('services.stripe.cancel_url'),
+            'cancel_url' => config('services.stripe.cancel_url') . '?session_id={CHECKOUT_SESSION_ID}',
             'metadata' => [
                 'order_id' => $orderId,
             ],

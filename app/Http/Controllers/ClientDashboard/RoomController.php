@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\ClientDashboard;
 
 
+use App\Cores\General\Enums\ReservationStatus;
 use App\Cores\General\RepositoryInterfaces\RoomRepositoryInterface;
 use App\Http\Controllers\Controller;
 use Inertia\Inertia;
@@ -23,13 +24,14 @@ class RoomController extends Controller
         $rooms->transform(function ($room) {
             $room->blocked_ranges = $room->reservations
                 ->map(fn($r) => [
-                    'start' => $r->check_in_date,
-                    'end'   => $r->check_out_date,
+                    'start'   => $r->check_in_date,
+                    'end'     => $r->check_out_date,
+                    'pending' => $r->status === ReservationStatus::PENDING->value,
                 ]);
+
             unset($room->reservations);
             return $room;
         });
-
         return Inertia::render('ClientDashboard/MakeReservation/Rooms', [
             'rooms' => $rooms
         ]);

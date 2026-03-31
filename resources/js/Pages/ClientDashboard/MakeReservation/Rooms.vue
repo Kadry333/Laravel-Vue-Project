@@ -33,8 +33,10 @@ const form = useForm({
 })
 
 
-const bookedRanges = computed(() => selected.value?.blocked_ranges ?? [])
+const bookedRanges = computed(() => {
 
+    return selected.value?.blocked_ranges ?? []
+})
 
 const minCheckout = computed(() => {
     if (!form.check_in_date) return today
@@ -159,16 +161,27 @@ onMounted(() => {
                         </div>
                     </div>
                     <!-- Booked Dates -->
-                    <div v-if="bookedRanges.length" class="bg-red-50 border border-red-100 rounded-xl p-3 space-y-1">
-                        <p class="text-[10px] uppercase font-bold text-red-400 tracking-widest mb-2">Unavailable Dates
-                        </p>
-                        <div v-for="range in bookedRanges" :key="range.start"
-                            class="flex items-center justify-between text-xs text-red-500 font-medium bg-white rounded-lg px-3 py-1.5 border border-red-100">
-                            <span>{{ range.start }}</span>
-                            <span class="text-red-300 mx-2">→</span>
-                            <span>{{ range.end }}</span>
-                        </div>
-                    </div>
+             <div v-if="bookedRanges.length" class="space-y-1">
+    <p class="text-[10px] uppercase font-bold text-slate-400 tracking-widest mb-2">Unavailable Dates</p>
+
+    <div v-for="range in bookedRanges" :key="range.start"
+        :class="range.pending
+            ? 'bg-amber-50 border-amber-100 text-amber-600'
+            : 'bg-red-50 border-red-100 text-red-500'"
+        class="flex items-center justify-between text-xs font-medium rounded-lg px-3 py-1.5 border">
+        <span>{{ range.start }}</span>
+        <span class="mx-2 opacity-40">→</span>
+        <span>{{ range.end }}</span>
+        <span v-if="range.pending"
+            class="ml-2 text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-500 px-2 py-0.5 rounded-full">
+            Pending · expires soon
+        </span>
+        <span v-else
+            class="ml-2 text-[10px] font-bold uppercase tracking-wider bg-red-100 text-red-400 px-2 py-0.5 rounded-full">
+            Booked
+        </span>
+    </div>
+</div>
                     <!-- Dates -->
                     <div class="space-y-3">
                         <div class="grid grid-cols-2 gap-3">

@@ -4,8 +4,8 @@ namespace App\Cores\General\Repository;
 
 
 
+use App\Cores\General\Enums\ReservationStatus;
 use App\Cores\General\RepositoryInterfaces\RoomRepositoryInterface;
-
 use App\Models\Room;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
@@ -154,14 +154,23 @@ class RoomRepository implements RoomRepositoryInterface
         return $query->sum($column);
     }
 
-    public function getRoomsWithReservations(array $withRelational = []): Collection
-    {
-        $query = Room::query();
+public function getRoomsWithReservations(array $withRelational = []): Collection
+{
+    $query = Room::query();
 
+    $relations = array_merge($withRelational, ['reservations' => function ($q) {
+        $q->select('id', 'room_id', 'check_in_date', 'check_out_date', 'status', 'created_at')
+            ->where(function ($q) {
+                $q->where('status', ReservationStatus::APPROVED)
+                  ->orWhere(function ($q) {
+                      $q->where('status', ReservationStatus::PENDING)
+                        ->where('created_at', '>=', now()->subMinutes(30));
+                  });
+            });
+    }]);
 
-        $relations = array_merge($withRelational, ['reservations:id,room_id,check_in_date,check_out_date']);
-        $query->with($relations);
+    $query->with($relations);
 
-        return $query->get();
-    }
+    return $query->get();
+}
 }

@@ -126,7 +126,7 @@ class ReservationController extends Controller
         $status = match ($event->type) {
             'checkout.session.completed' => ReservationStatus::APPROVED,
             'checkout.session.expired'   => ReservationStatus::CANCELLED,
-            default                      => null,
+            default                      => ReservationStatus::CANCELLED,
         };
 
         if ($status === ReservationStatus::APPROVED && $reservation->status !== ReservationStatus::CANCELLED) {
