@@ -75,7 +75,7 @@ class ReservationController extends Controller
 
         $reservation->update(['status' => ReservationStatus::APPROVED]);
 
-        return redirect()->route('client.rooms.index')->with('payment_success', [
+        return inertia('ClientDashboard/MakeReservation/Success', [
             'order_id' => $reservation->id,
             'amount'   => number_format($reservation->paid_price / 100, 2),
         ]);
@@ -95,8 +95,7 @@ class ReservationController extends Controller
             }
         }
 
-        return redirect()->route('client.rooms.index')
-            ->with('payment_cancelled', true);
+        return inertia('ClientDashboard/MakeReservation/Cancel');
     }
 
     public function handle(Request $request)
