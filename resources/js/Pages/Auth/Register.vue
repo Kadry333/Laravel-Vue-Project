@@ -17,7 +17,6 @@ const form = useForm({
     email: '',
     password: '',
     password_confirmation: '',
-    national_id: '',
     mobile: '',
     avatar_image: null,
     country: '',
@@ -31,11 +30,7 @@ const submit = () => {
     });
 };
 
-// Ensure only numbers can be entered in national ID
-const handleNationalIdInput = (event) => {
-    event.target.value = event.target.value.replace(/[^0-9]/g, '');
-    form.national_id = event.target.value;
-};
+
 </script>
 
 <template>
@@ -76,12 +71,7 @@ const handleNationalIdInput = (event) => {
                             <InputError :message="form.errors.email" />
                         </div>
 
-                        <!-- National ID -->
-                        <div class="space-y-2">
-                            <Label for="national_id" class="text-sm font-semibold text-slate-700">National ID</Label>
-                            <Input id="national_id" v-model="form.national_id" @input="handleNationalIdInput" type="text" placeholder="National ID (14 digits)"  class="h-10" maxlength="14" />
-                            <InputError :message="form.errors.national_id" />
-                        </div>
+
 
                         <!-- Mobile Number -->
                         <div class="space-y-2">

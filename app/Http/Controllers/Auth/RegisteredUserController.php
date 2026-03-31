@@ -34,9 +34,8 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
+            'email' => 'required|string|lowercase|email|max:255|unique:' . User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'national_id' => 'required|numeric|digits:14|starts_with:2,3|unique:users,national_id',
             'mobile' => 'required|string|regex:/^[+]?[0-9]{10,15}$/|unique:users,mobile',
             'avatar_image' => 'nullable|image|mimes:jpg,jpeg|max:2048',
             'country' => 'required|string|exists:lc_countries,official_name',
@@ -49,7 +48,7 @@ class RegisteredUserController extends Controller
 
         // Store avatar image in storage/app/public/clients/avatars
         $avatarName = 'default.png';
-     if ($request->hasFile('avatar_image')) {
+        if ($request->hasFile('avatar_image')) {
             $file = $request->file('avatar_image');
 
             $filename = time() . '_' . $file->getClientOriginalName();
@@ -61,7 +60,6 @@ class RegisteredUserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'national_id' => $request->national_id,
             'mobile' => $request->mobile,
             'avatar_image' => $avatarName,
             'country_id' => $countryId,
