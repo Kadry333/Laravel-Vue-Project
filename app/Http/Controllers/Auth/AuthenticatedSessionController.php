@@ -34,9 +34,12 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerate();
 
         $user = Auth::user();
+        $user->update([
+            'last_login_at' => now(),
+        ]);
 
         // Role-based redirection logic (Direct redirect, bypass intended memory)
-       if ($user->hasRole('admin')) {
+        if ($user->hasRole('admin')) {
             return redirect('/admins/dashboard');
         } elseif ($user->hasRole('manager')) {
             return redirect('/admins/dashboard');
