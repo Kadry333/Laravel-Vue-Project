@@ -4,7 +4,7 @@ namespace App\Http\Controllers\AdminDashboard;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreClientRequest;
-use App\Http\Requests\Admin\ManageClientRequests\UpdateClientRequest;
+use App\Http\Requests\Admin\ManageClient\UpdateClientRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -101,10 +101,8 @@ class ClientController extends Controller
             $file = $request->file('avatar_image');
 
             $filename = time() . '_' . $file->getClientOriginalName();
-
-            $file->storeAs('avatars', $filename, 'public');
-
-            $data['avatar_image'] = $filename;
+            $path = $file->storeAs('clients/avatars', $filename, 'public');
+            $data['avatar_image'] = $path;
         }
 
         $data['password']    = Hash::make($data['password']);
@@ -141,15 +139,14 @@ class ClientController extends Controller
 
         if ($request->hasFile('avatar_image')) {
             if ($client->avatar_image && $client->avatar_image !== 'default.png') {
-                Storage::disk('public')->delete('avatars/' . $client->avatar_image);
+                Storage::disk('public')->delete($client->avatar_image);
             }
             $file = $request->file('avatar_image');
 
             $filename = time() . '_' . $file->getClientOriginalName();
+            $path = $file->storeAs('clients/avatars', $filename, 'public');
 
-            $file->storeAs('avatars', $filename, 'public');
-
-            $data['avatar_image'] = $filename;
+            $data['avatar_image'] = $path;
         } else {
             unset($data['avatar_image']);
         }
@@ -171,7 +168,7 @@ class ClientController extends Controller
         }
         if (!empty($client->avatar_image) && $client->avatar_image !== 'default.png') {
 
-            $path = 'avatars/' . $client->avatar_image;
+            $path =  $client->avatar_image;
 
             if (Storage::disk('public')->exists($path)) {
                 Storage::disk('public')->delete($path);

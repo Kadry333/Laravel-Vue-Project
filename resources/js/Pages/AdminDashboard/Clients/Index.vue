@@ -293,7 +293,7 @@ function goToPage(url) {
                                         row.original.avatar_image &&
                                         row.original.avatar_image !==
                                             'default.png'
-                                            ? '/storage/avatars/' +
+                                            ? '/storage/' +
                                               row.original.avatar_image
                                             : '/images/default.png'
                                     "

@@ -49,23 +49,12 @@ class RegisteredUserController extends Controller
 
         // Handle Avatar Upload - Improved storage
         $avatarName = 'default.png';
-        if ($request->hasFile('avatar_image')) {
+       if ($request->hasFile('avatar_image')) {
             $file = $request->file('avatar_image');
-            
-            // Validate file is actually an image
-            if ($file->isValid() && in_array($file->getClientOriginalExtension(), ['jpg', 'jpeg'])) {
-                // Create unique filename with user identifier
-                $avatarName = 'user_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-                
-                // Ensure avatars directory exists
-                $avatarsPath = public_path('avatars');
-                if (!is_dir($avatarsPath)) {
-                    mkdir($avatarsPath, 0755, true);
-                }
-                
-                // Move file to avatars directory
-                $file->move($avatarsPath, $avatarName);
-            }
+
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $avatarName = $file->storeAs('clients/avatars', $filename, 'public');
+            $data['avatar_image'] = $avatarName;
         }
 
         $user = User::create([
