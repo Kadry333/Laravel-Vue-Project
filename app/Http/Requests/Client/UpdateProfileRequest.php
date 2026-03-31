@@ -28,9 +28,9 @@ class UpdateProfileRequest extends FormRequest
                 'regex:/^[+]?[0-9]{10,15}$/',
                 Rule::unique('users', 'mobile')->ignore($this->user()?->id),
             ],
-            'country_id' => ['nullable', 'integer', 'exists:lc_countries,id'],
-            'gender' => ['nullable', 'in:male,female'],
-            'avatar_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
+            'country_id' => ['required', 'integer', 'exists:lc_countries,id'],
+            'gender' => ['required', 'in:male,female'],
+            'avatar_image' => ['nullable', 'image', 'mimes:jpg,jpeg', 'max:2048'],
         ];
     }
 }

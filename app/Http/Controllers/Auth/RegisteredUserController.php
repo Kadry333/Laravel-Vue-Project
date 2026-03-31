@@ -49,10 +49,12 @@ class RegisteredUserController extends Controller
 
         // Store avatar image in storage/app/public/clients/avatars
         $avatarName = 'default.png';
-        if ($request->hasFile('avatar_image')) {
+     if ($request->hasFile('avatar_image')) {
             $file = $request->file('avatar_image');
-            $avatarName = time() . '_' . $file->getClientOriginalName();
-            $file->storeAs('clients/avatars', $avatarName, 'public');
+
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $avatarName = $file->storeAs('clients/avatars', $filename, 'public');
+            $data['avatar_image'] = $avatarName;
         }
 
         $user = User::create([

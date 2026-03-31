@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\Admin\ManageClientRequests;
+namespace App\Http\Requests\Admin\ManageClient;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -22,14 +22,14 @@ class UpdateClientRequest extends FormRequest
      */
     public function rules(): array
     {
-        $clientId = $this->route('client')->id;
+          $clientId = $this->route('client')->id;
         return [
             'name' => 'required|string|max:255',
-            'email' =>  'required|email|unique:users,email,' . $clientId,
+            'email' =>  'required|email|max:255|unique:users,email,' . $clientId,
             'country_id'   => 'required|integer|exists:lc_countries,id',
             'gender' => 'required|in:male,female',
-            'mobile' => 'regex:/^\+?[0-9]{10,15}$/|unique:users,mobile,' . $clientId,
-            'avatar_image' => 'nullable|image|mimes:jpg,jpeg',
+            'mobile' => 'regex:/^[+]?[0-9]{10,15}$/|unique:users,mobile,' . $clientId,
+            'avatar_image' => 'nullable|image|mimes:jpg,jpeg|max:2048',
         ];
     }
 }

@@ -135,7 +135,7 @@ function submit() {
                     <input
                         v-model="form.password"
                         type="password"
-                        placeholder="Min 6 characters"
+                        placeholder="Min 8 characters"
                         :class="['w-full px-4 py-2.5 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 bg-white',
                             form.errors.password ? 'border-red-400' : 'border-gray-200']"
                     />
