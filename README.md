@@ -234,7 +234,8 @@ The countries package data should be seeded before using registration and client
 ## Yoc can also create other admins through console command.
 ## For Example:
 ```bash
-## php artisan create:admin --email=admin2@admin.com --password=1234566
+ php artisan create:admin --email=admin2@admin.com --password=1234566
+ ```
 
 
 
