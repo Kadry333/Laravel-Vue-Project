@@ -1,7 +1,7 @@
 # Simple Hotel System
 
 ## Overview
-Simple Hotel System is a hotel management system built with Laravel, Vue.js, and Inertia.js. It is designed to manage hotels, users, rooms, floors, reservations, approvals, and role-based access in one application.
+Grand Luxury is a hotel management system built with Laravel, Vue.js, and Inertia.js. It is designed to manage hotels, users, rooms, floors, reservations, approvals, and role-based access in one application.
 
 The project separates responsibilities between administrators, managers, receptionists, and clients. The backend handles authorization, approvals, reservations, notifications, scheduling, and API access, while the frontend provides the dashboard and booking flow through Vue and Inertia.
 
@@ -165,7 +165,18 @@ php artisan migrate
 Seed the countries package tables:
 
 ```bash
-php artisan db:seed --class="Lwwcas\\LaravelCountries\\Database\\Seeders\\LwwcasDatabaseSeeder"
+
+php artisan w-countries:install
+
+You will be prompted with some questions:
+
+Would you like to run the migrations now?
+→ Type: yes
+Select languages to install
+→ Type: 0 (to install default English only)
+(or choose any languages you prefer)
+Do you want to choose again?
+→ Type: no
 ```
 
 Run the project seeders:
@@ -190,7 +201,7 @@ npm run dev
 If you want queued notifications to run locally, start a queue worker in a separate terminal:
 
 ```bash
-php artisan queue:listen
+php artisan queue:work
 ```
 
 ## Environment Notes
@@ -203,9 +214,30 @@ Make sure the local environment is configured for:
 
 The countries package data should be seeded before using registration and client forms, because the application reads country values from the `lc_countries` tables.
 
-## Default Admin Account
+## Default Accounts with password `123456` for all accounts
+- Admin:
 - Email: `admin@admin.com`
-- Password: `123456`
+
+- Managers:
+- Email: `ramadan@hotel.com`
+- Email: `amr@hotel.com`
+- Email: `ahmed.manager@hotel.com`
+
+- Receptionists:
+- Email: `omar@hotel.com`
+- Email: `hana@hotel.com`
+
+- Clients:
+- Email: `ahmed@client.com`
+- Email: `mona@client.com`
+
+## Yoc can also create other admins through console command.
+## For Example:
+```bash
+## php artisan create:admin --email=admin2@admin.com --password=1234566
+
+
+
 
 ## Important Technical Notes
 - Prices are stored in cents in the database and displayed in dollars in the application.
@@ -230,9 +262,9 @@ npm run dev
 Run the queue worker in another terminal if you want queued notifications to be processed locally:
 
 ```bash
-php artisan queue:listen
+php artisan queue:work
 ```
 
 Then open the local application in the browser and either:
-- Log in with the seeded admin account
+- Log in with the seeded accounts
 - Register a client account and continue through the approval flow

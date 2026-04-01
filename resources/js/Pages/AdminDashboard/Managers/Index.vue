@@ -190,7 +190,7 @@ const table = useVueTable({
                                 <div class="flex items-center gap-1.5">
                                     <img
                                         :src="
-                                            manager.avatar_image
+                                            manager.avatar_image && manager.avatar_image !== 'default.png'
                                                 ? `/storage/${manager.avatar_image}`
                                                 : '/images/default.png'
                                         "

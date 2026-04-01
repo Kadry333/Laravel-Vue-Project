@@ -17,36 +17,15 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            RolesAndPermissionsSeeder::class,
-            AdminSeeder::class,
-            UserSeeder::class,
+            RolesAndPermissionsSeeder::class, 
+            AdminSeeder::class,               
+            ManagerSeeder::class,             
+            ReceptionistSeeder::class,        
+            ClientSeeder::class,              
+            FloorSeeder::class,               
+            RoomSeeder::class,                
+            ReservationSeeder::class, 
             
         ]);
-        // ── Managers ───────────────────────────────
-        $managers = User::factory(5)->approved()->create();
-        $managers->each(fn($m) => $m->assignRole('manager'));
-
-        // ── Receptionists (created by managers) ────
-        $managers->each(function ($manager) {
-            $receptionists = User::factory(3)->approved()->create([
-                'created_by' => $manager->id,
-            ]);
-            $receptionists->each(fn($r) => $r->assignRole('receptionist'));
-        });
-
-        // ── Clients ────────────────────────────────
-        $receptionists = User::role('receptionist')->get();
-
-        // Approved clients
-        $receptionists->each(function ($receptionist) {
-            $clients = User::factory(5)->approved()->assignCountryToClients()->create([
-                'approved_by' => $receptionist->id,
-            ]);
-            $clients->each(fn($c) => $c->assignRole('client'));
-        });
-
-        // Pending clients (no approved_by)
-        $pendingClients = User::factory(10)->pending()->create();
-        $pendingClients->each(fn($c) => $c->assignRole('client'));
     }
 }
