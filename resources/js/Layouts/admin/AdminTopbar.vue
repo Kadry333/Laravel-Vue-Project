@@ -2,15 +2,17 @@
 import { computed } from 'vue'
 import { Link, usePage } from '@inertiajs/vue3'
 import { SidebarTrigger } from '@/components/ui/sidebar'
-import { Separator }      from '@/components/ui/separator'
-import { Input }          from '@/components/ui/input'
-import { Button }         from '@/components/ui/button'
+import { Separator } from '@/components/ui/separator'
 import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem,
-  DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Search, Bell, Settings, LogOut } from 'lucide-vue-next'
+import { Settings, LogOut } from 'lucide-vue-next'
 
 const page = usePage()
 const DEFAULT_AVATAR_PATH = '/images/default.png'
@@ -57,21 +59,6 @@ const initials = computed(() => {
     <Separator orientation="vertical" class="h-5 mr-1" />
 
     <div class="flex-1" />
-
-    <div class="relative hidden sm:block">
-      <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
-      <Input
-        placeholder="Search…"
-        class="pl-9 w-52 h-9 bg-slate-50 border-slate-200 text-[13px]
-               focus-visible:ring-sky-500/20 focus-visible:border-sky-400"
-      />
-    </div>
-
-    <Button variant="outline" size="icon" class="h-9 w-9 relative border-slate-200">
-      <Bell class="w-4 h-4 text-slate-500" />
-      <span class="absolute top-1.5 right-1.5 w-[7px] h-[7px]
-                   bg-red-500 rounded-full border-2 border-white" />
-    </Button>
 
     <DropdownMenu>
       <DropdownMenuTrigger as-child>

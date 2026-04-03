@@ -190,7 +190,7 @@ const submit = () => {
                                 Profile photo
                             </h2>
                             <p class="text-sm leading-6 text-[#5b708b]">
-                                Upload a JPG or PNG image up to 2MB.
+                                Upload a JPG or JPEG image up to 2MB.
                             </p>
                         </div>
                     </div>
@@ -201,7 +201,7 @@ const submit = () => {
                             id="avatar_image"
                             ref="avatarInput"
                             type="file"
-                            accept=".jpg,.jpeg,.png"
+                            accept=".jpg,.jpeg"
                             class="sr-only"
                             @change="handleAvatarChange"
                         />

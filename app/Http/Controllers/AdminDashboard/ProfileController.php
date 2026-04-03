@@ -55,7 +55,7 @@ class ProfileController extends Controller
                 'starts_with:2,3',
                 Rule::unique('users', 'national_id')->ignore($user->id),
             ];
-            $rules['avatar_image'] = ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'];
+            $rules['avatar_image'] = ['nullable', 'image', 'mimes:jpg,jpeg', 'max:2048'];
         }
 
         $data = $request->validate($rules);
