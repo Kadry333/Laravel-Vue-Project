@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Hotel, UserPlus, Image as ImageIcon } from 'lucide-vue-next';
-import InputError from '@/Components/InputError.vue';
+import InputError from '@/components/InputError.vue';
 import { computed } from 'vue';
 
 const page = usePage();
