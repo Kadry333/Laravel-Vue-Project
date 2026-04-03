@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import Checkbox from '@/Components/Checkbox.vue';
+import Checkbox from '@/components/Checkbox.vue';
 import { Hotel, LogIn } from 'lucide-vue-next';
 import InputError from '@/components/InputError.vue';
 
